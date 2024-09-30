@@ -1,0 +1,319 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: monospace;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.root {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  grid-template-rows: auto 1fr; /* Top toolbar takes height of its content, work area fills the rest */
+  grid-template-columns: 1fr 300px; /* Left toolbar is 200px, work area takes the remaining space */
+  grid-template-areas:
+    "top-toolbar top-toolbar"
+    "workarea left-toolbar";
+}
+
+/* Top toolbar styles */
+.top-menu {
+  grid-area: top-toolbar;
+  background-color: purple; /* Example background color */
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  gap: 2rem;
+}
+
+.left-toolbar {
+  grid-area: left-toolbar;
+  background-color: lightblue; /* Example background color */
+  box-sizing: border-box;
+}
+
+/* Work area styles */
+.workarea {
+  grid-area: workarea;
+  background-color: lightgreen; /* Example background color */
+  box-sizing: border-box;
+  position: relative;
+}
+
+.workarea-svg {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hoverable-path:hover {
+  stroke: orange;
+}
+
+[selected-control-pt] {
+  fill: red;
+}
+
+[component-control-pt]:hover {
+  fill: green;
+}
+
+[draggable-footprint]:hover {
+  background: #f1f1f1;
+}
+
+[draggable-footprint]:hover .footprint-path {
+  /*  fill: orange;*/
+}
+
+.drop-layer-target {
+  border-bottom: 1px solid grey;
+}
+
+.no-select {
+  -webkit-user-select: none; /* Chrome, Safari, Opera */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version for modern browsers */
+}
+
+.hidden {
+  display: none;
+}
+
+/* ----------------- START FOOTPRINT MENU ----------------- */
+
+.footprints-list {
+  background: antiquewhite;
+  margin-bottom: 10px;
+}
+
+/* Wrapper for each footprint item */
+.footprint-item {
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* Icon container for the footprint SVG */
+.footprint-icon {
+  width: 40px;
+  height: 40px;
+  padding: 3px;
+}
+
+/* For centering the SVG inside the icon container */
+.footprint-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Margin between the icon and the footprint name */
+.footprint-name {
+  margin-left: 10px;
+}
+
+/* Delete button styling */
+.delete-btn {
+  margin-left: auto; /* Push to the far right */
+  color: red;
+  cursor: pointer;
+}
+
+/* Optional: Add hover effect to the delete button */
+.delete-btn:hover {
+  color: darkred;
+}
+
+/* ----------------- ENDOF FOOTPRINT MENU ----------------- */
+
+/* ----------------- START LEFT MENU ----------------- */
+
+/* Wrapper for the entire menu */
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+}
+
+/* Title for the menu header */
+.menu-title {
+  font-size: 1.15rem;
+  font-weight: bold;
+}
+
+/* Import button styling */
+.import-btn {
+  background-color: #007bff; /* Blue background */
+  color: white;
+  border-radius: 4px;
+  outline: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Hover effect for the import button */
+.import-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Container to hold the buttons and align them next to each other */
+.menu-buttons-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* Adds space between the buttons */
+}
+
+/* Button styling */
+.menu-button {
+  background-color: #007bff; /* Button color (blue) */
+  color: white; /* Text color (white) */
+  padding: 8px 16px; /* Padding inside the button */
+  border-radius: 4px; /* Rounded corners */
+  text-align: center; /* Center the text */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease; /* Smooth background color change */
+  font-size: 14px;
+  font-weight: bold;
+  border: none; /* Remove border */
+}
+
+/* Hover effect for the buttons */
+.menu-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* ----------------- ENDOF LEFT MENU ----------------- */
+
+/* ----------------- START LAYER MENU ----------------- */
+
+/* Wrapper for each layer item */
+.layer-item {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  height: 17px;
+}
+
+/* Drag handle */
+.layer-grabber {
+  cursor: grab;
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+/* Container for layer name and checkbox */
+.layer-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+}
+
+/* Aligns checkbox and layer name */
+.layer-name input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+/* Color picker */
+.color-picker {
+  width: 20px;
+  height: 20px;
+  border: 1px solid black;
+  margin-left: auto;
+}
+
+/* Optional: Styling for when a layer is not visible */
+.layer-not-visible {
+  opacity: 0.5;
+}
+
+/* ----------------- ENDOF LAYER MENU ----------------- */
+
+/* ----------------- START EDIT MENU ----------------- */
+
+.modal {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 200px;
+  padding: 10px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-title {
+  font-size: 14px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  color: red;
+}
+
+.modal-content {
+  margin-top: 10px;
+}
+
+.form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  justify-content: space-between;
+}
+
+.form-group label {
+  margin-right: 10px;
+  width: 100px; /* Adjust the width as needed for alignment */
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"] {
+  width: 75px;
+  padding: 1px 5px;
+  text-align: left;
+}
+
+.form-group input[type="checkbox"] {
+}
+
+.delete-button {
+  background-color: #ff4d4d; /* Red color to indicate danger */
+  color: white;
+  padding: 4px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 75%; /* Make the button full width */
+  text-align: center;
+}
+
+.delete-button:hover {
+  background-color: #ff1a1a; /* Darker red on hover */
+}
+
+/* ----------------- ENDOF EDIT MENU ----------------- */
