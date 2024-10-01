@@ -142,7 +142,7 @@ export function view(state) {
 
           <g class="transform-group">
             <circle
-              r=${5 / state?.panZoomFns?.scale()}
+              r=${5 / (state?.panZoomFns?.scale() ?? 1)}
               x="0"
               y="0"
               fill="red"
@@ -207,7 +207,7 @@ function renderTempLine(state) {
     <circle 
       cx="${currentPoint[0]}" 
       cy="${-currentPoint[1]}" 
-      r="${5 / state?.panZoomFns?.scale()}" 
+      r="${5 / (state?.panZoomFns?.scale() ?? 1)}" 
       fill="green"
     />
   `);
@@ -232,7 +232,7 @@ function renderHoverablePaths(state) {
           d=${d} 
           fill="none"
           stroke="#00000000" 
-          stroke-width=${8 / state?.panZoomFns?.scale()} 
+          stroke-width=${8 / (state?.panZoomFns?.scale() ?? 1)} 
           stroke-linecap="round" 
           stroke-linejoin="round" 
           class="hoverable-path"
@@ -269,7 +269,7 @@ function renderEditablePath(state) {
         .pointIdx=${i}
         .type=${type}
         .index=${index}
-        r="${5 / state?.panZoomFns?.scale()}" 
+        r="${5 / (state?.panZoomFns?.scale() ?? 1)}" 
         cx=${pt[0]} 
         cy=${-pt[1]} 
         fill="purple"

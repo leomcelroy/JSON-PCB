@@ -49,16 +49,16 @@ export function renderComponents(state) {
           class="hidden"
           cx="${position[0]}" 
           cy="${-position[1]}" 
-          r="${5 / state?.panZoomFns?.scale()}" 
+          r="${5 / (state?.panZoomFns?.scale() ?? 1)}" 
           fill="red"/>
         <text 
           x="${position[0]}" 
           y="${-position[1]}" 
-          font-size="${13 / state?.panZoomFns?.scale()}" 
+          font-size="${13 / (state?.panZoomFns?.scale() ?? 1)}" 
           fill="lightgreen"
           opacity=".95"
           stroke="black" 
-          stroke-width="${0.5 / state?.panZoomFns?.scale()}"
+          stroke-width="${0.5 / (state?.panZoomFns?.scale() ?? 1)}"
           text-anchor="middle"
           dominant-baseline="middle">${padId}</text>
       `);
@@ -70,12 +70,12 @@ export function renderComponents(state) {
         .componentId=${id}
         cx="${translate[0]}" 
         cy="${-translate[1]}" 
-        r="${5 / state?.panZoomFns?.scale()}" 
+        r="${5 / (state?.panZoomFns?.scale() ?? 1)}" 
         fill="black"/>
       <text 
         x="${translate[0]}" 
-        y="${-(translate[1] - 15 / state?.panZoomFns?.scale())}" 
-        font-size="${12 / state?.panZoomFns?.scale()}" 
+        y="${-(translate[1] + 15 / (state?.panZoomFns?.scale() ?? 1))}" 
+        font-size="${12 / (state?.panZoomFns?.scale() ?? 1)}" 
         fill="black"
         text-anchor="middle"
         dominant-baseline="middle">${id}</text>
