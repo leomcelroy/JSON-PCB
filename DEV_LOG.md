@@ -19,12 +19,11 @@
     - gerber?
   - new file
   - examples
-  - center view
-  - view json
+  - [x] center view
+  - [x] view json
   - link to github
 - make it look nice
-- json view/editor
-- try to match current layer order
+- log mouse position in the corner
 
 - box select
 - a grid
@@ -41,6 +40,8 @@
 
 ## DONE
 
+- try to match current layer order
+- json view/editor
 - display component labels
 - display pad labels
 - indices for more than first shape in a path are wrong

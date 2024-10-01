@@ -6,6 +6,9 @@ import { renderFootprintMenu } from "./renderFootprintMenu.js";
 import { renderComponents } from "./renderComponents.js";
 import { renderEditModal } from "./renderEditModal.js";
 import { addAndEditPath } from "./addAndEditPath.js";
+import { jsonPopUp } from "./jsonPopUp.js";
+import { setBoard } from "./state.js";
+import { formatCode } from "./formatCode.js";
 
 export function view(state) {
   const { layers, colorMap, hoverablePaths, layerOrder, layerNotVisible } =
@@ -35,21 +38,65 @@ export function view(state) {
         <div class="code-editor"></div>
       </div>
       <div class="top-menu">
-        <div>Save</div>
-        <div class="dropdown">
-          <div>Export</div>
+        <div class="menu-item hidden">Save</div>
+
+        <div class="menu-item dropdown">
+          <div class="dropdown-toggle">Export</div>
           <div class="dropdown-items">
-            <div>PNG</div>
-            <div>Gerber</div>
+            <div class="dropdown-item">JSON</div>
+            <div class="dropdown-item">PNG</div>
+            <div class="dropdown-item">Gerber</div>
           </div>
         </div>
-        <div>Edit JSON</div>
-        <div>New File</div>
-        <div class="dropdown">
-          <div>Examples</div>
+
+        <div
+          class="menu-item"
+          @click=${(e) => {
+            function removeExtraData(key, value) {
+              if (key === "shapes") return undefined;
+              if (key === "boundingBox") return undefined;
+              if (key === "pathData") return undefined;
+
+              return value;
+            }
+
+            const newText = formatCode(
+              JSON.stringify(state.board, removeExtraData),
+            );
+
+            jsonPopUp({
+              text: newText,
+              onSave: (newJSON) => {
+                const newBoard = JSON.parse(newJSON);
+                setBoard(newBoard);
+              },
+            });
+          }}
+        >
+          Edit JSON
+        </div>
+        <div class="menu-item">New File</div>
+
+        <div class="menu-item dropdown">
+          <div class="dropdown-toggle">Examples</div>
           <div class="dropdown-items"></div>
         </div>
-        <div>Center View</div>
+
+        <div
+          class="menu-item"
+          @click=${(e) => {
+            const board = state.board;
+            const svg = document.querySelector(".workarea-svg");
+            const boundingBox = board.boundingBox;
+
+            svg.panZoomFns.setScaleXY({
+              x: [boundingBox.xMin, boundingBox.xMax],
+              y: [boundingBox.yMin, boundingBox.yMax],
+            });
+          }}
+        >
+          Center View
+        </div>
       </div>
       <div class="right-toolbar">
         ${renderFootprintMenu(state)}
@@ -83,20 +130,53 @@ export function view(state) {
             y="-10000"
             width="20000"
             height="20000"
+            fill="white"
+          />
+          <rect
+            x="-10000"
+            y="-10000"
+            width="20000"
+            height="20000"
             fill="lightgrey"
           />
 
           <g class="transform-group">
-            <circle r="5" x="0" y="0" fill="red" />
-            ${layersView} ${renderHoverablePaths(state)}
-            ${renderComponents(state)} ${renderTempLine(state)}
-            ${renderEditablePath(state)}
+            <circle
+              r=${5 / state?.panZoomFns?.scale()}
+              x="0"
+              y="0"
+              fill="red"
+            />
+            ${layersView} ${renderBoardBBox(state)}
+            ${renderHoverablePaths(state)} ${renderComponents(state)}
+            ${renderTempLine(state)} ${renderEditablePath(state)}
           </g>
         </svg>
         ${renderEditModal(state)}
       </div>
     </div>
   `;
+}
+
+function renderBoardBBox(state) {
+  return "";
+  if (!state.board) return "";
+
+  const { xMin, xMax, yMin, yMax } = state.board.boundingBox;
+  const boxWidth = xMax - xMin;
+  const boxHeight = yMax - yMin;
+
+  return svg`
+    <rect 
+      x="${xMin}" 
+      y="${yMin}" 
+      width="${boxWidth}" 
+      height="${boxHeight}" 
+      fill="none" 
+      stroke="red" 
+      vector-effect="non-scaling-stroke"
+      stroke-dasharray="5, 5"/>
+    `;
 }
 
 function renderTempLine(state) {
@@ -117,6 +197,7 @@ function renderTempLine(state) {
         y2="${currentPoint[1]}" 
         stroke="blue" 
         stroke-width="2"
+        vector-effect="non-scaling-stroke"
         stroke-dasharray="5, 5" 
       />
     `);
@@ -126,7 +207,7 @@ function renderTempLine(state) {
     <circle 
       cx="${currentPoint[0]}" 
       cy="${currentPoint[1]}" 
-      r="5" 
+      r="${5 / state?.panZoomFns?.scale()}" 
       fill="green"
     />
   `);
@@ -187,7 +268,7 @@ function renderEditablePath(state) {
         .pointIdx=${i}
         .type=${type}
         .index=${index}
-        r="5" 
+        r="${5 / state?.panZoomFns?.scale()}" 
         cx=${pt[0]} 
         cy=${pt[1]} 
         fill="purple"
@@ -199,9 +280,11 @@ function renderEditablePath(state) {
       d=${d} 
       stroke="black" 
       stroke-width="5" 
+      vector-effect="non-scaling-stroke"
       stroke-linecap="round" 
       stroke-linejoin="round" 
-      fill="none" />
+      fill="none" 
+      />
     ${points}
 
   `;

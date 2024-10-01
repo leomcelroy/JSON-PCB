@@ -24,12 +24,11 @@ body {
 
 /* Top toolbar styles */
 .top-menu {
+  height: max-content;
   grid-area: top-toolbar;
   background-color: purple;
-  padding: 10px;
   box-sizing: border-box;
   display: flex;
-  gap: 2rem;
 }
 
 .right-toolbar {
@@ -122,6 +121,8 @@ body {
 
 /* Icon container for the footprint SVG */
 .footprint-icon {
+  min-width: 40px;
+  min-height: 40px;
   width: 40px;
   height: 40px;
   padding: 3px;
@@ -335,3 +336,66 @@ body {
 }
 
 /* ----------------- ENDOF EDIT MENU ----------------- */
+
+.menu-item {
+  padding: 10px 10px;
+  cursor: pointer;
+  height: 100%;
+  /*  border-radius: 4px;*/
+  transition: background-color 0.3s;
+  color: lightgrey;
+}
+
+.menu-item:hover {
+  color: darkslategray;
+  background-color: lightpink;
+}
+
+/* Hidden Items */
+.hidden {
+  display: none;
+}
+
+/* Dropdown Menu Styling */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+}
+
+.dropdown-items {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: lightpink;
+  padding-bottom: 5px;
+  border-radius: 0px 0px 10px 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.dropdown-items .dropdown-item {
+  padding: 7px 10px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.dropdown-items .dropdown-item:hover {
+  background-color: #f0f0f0;
+}
+
+/* Show dropdown items on hover */
+.dropdown:hover .dropdown-items {
+  display: block;
+}
+
+/* Additional Styles */
+.menu-item:active {
+  background-color: #d0d0d0;
+}
+/* ----------------- START TOP MENU ----------------- */
+
+/* ----------------- ENDOF TOP MENU ----------------- */

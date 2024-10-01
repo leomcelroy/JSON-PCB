@@ -102,3 +102,69 @@ export function flipShapes(shapes, axis = "horizontal", origin = [0, 0]) {
     }
   });
 }
+
+export function translateBoundingBox(bbox, translate, origin = [0, 0]) {
+  const [ox, oy] = origin;
+  const [dx, dy] = translate;
+
+  return {
+    xMin: bbox.xMin + dx - ox,
+    xMax: bbox.xMax + dx - ox,
+    yMin: bbox.yMin + dy - oy,
+    yMax: bbox.yMax + dy - oy,
+  };
+}
+
+export function rotateBoundingBox(bbox, theta, origin = [0, 0]) {
+  const [ox, oy] = origin;
+
+  // Function to rotate a single point (x, y)
+  function rotatePoint(x, y, theta, ox, oy) {
+    const cosTheta = Math.cos(theta);
+    const sinTheta = Math.sin(theta);
+    const newX = cosTheta * (x - ox) - sinTheta * (y - oy) + ox;
+    const newY = sinTheta * (x - ox) + cosTheta * (y - oy) + oy;
+    return { x: newX, y: newY };
+  }
+
+  // Rotate all four corners of the bounding box
+  const topLeft = rotatePoint(bbox.xMin, bbox.yMin, theta, ox, oy);
+  const topRight = rotatePoint(bbox.xMax, bbox.yMin, theta, ox, oy);
+  const bottomLeft = rotatePoint(bbox.xMin, bbox.yMax, theta, ox, oy);
+  const bottomRight = rotatePoint(bbox.xMax, bbox.yMax, theta, ox, oy);
+
+  // Calculate new bounding box
+  const xMin = Math.min(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x);
+  const xMax = Math.max(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x);
+  const yMin = Math.min(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y);
+  const yMax = Math.max(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y);
+
+  return {
+    xMin,
+    xMax,
+    yMin,
+    yMax,
+  };
+}
+
+export function flipBoundingBox(bbox, axis = "horizontal") {
+  if (axis === "horizontal") {
+    // Swap xMin and xMax for horizontal flip
+    return {
+      xMin: -bbox.xMax,
+      xMax: -bbox.xMin,
+      yMin: bbox.yMin,
+      yMax: bbox.yMax,
+    };
+  } else if (axis === "vertical") {
+    // Swap yMin and yMax for vertical flip
+    return {
+      xMin: bbox.xMin,
+      xMax: bbox.xMax,
+      yMin: -bbox.yMax,
+      yMax: -bbox.yMin,
+    };
+  } else {
+    throw new Error("Invalid axis for flip");
+  }
+}

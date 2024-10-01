@@ -5,12 +5,15 @@ import { addComponentDragging } from "./addComponentDragging.js";
 import { addComponentAdding } from "./addComponentAdding.js";
 import { addLayerReordering } from "./addLayerReordering.js";
 import { addPathCreation } from "./addPathCreation.js";
+import { addDropUpload } from "./addDropUpload.js";
+
 import { initCodeEditor } from "./initCodeEditor.js";
 
 import { view } from "./view.js";
 import { render as r } from "lit-html";
 import { testPCB } from "./testPCB.js";
 import { contourToShapes } from "./contourToShapes.js";
+import { kicadParse } from "./kicadParse.js";
 
 function init(state) {
   // render app immediately
@@ -23,6 +26,16 @@ function init(state) {
   addPathCreation(svg);
   addComponentAdding(document.body);
   addLayerReordering(document.body);
+  addDropUpload(document.body, {
+    onDrop: ({ name, text }) => {
+      console.log(name, text);
+      const sParsed = kicadParse(text);
+
+      const oldBoard = state.board;
+      const newBoard = oldBoard.footprints.push(sParsed);
+      setBoard(state.board);
+    },
+  });
 
   // initCodeEditor(document.querySelector(".code-editor"));
 

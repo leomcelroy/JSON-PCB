@@ -11,8 +11,12 @@ import {
   translatePoint,
   rotatePoint,
   flipPoint,
+  translateBoundingBox,
+  rotateBoundingBox,
+  flipBoundingBox,
 } from "./shapeTransformations.js";
 import { getShapesBoundingBox } from "./getShapesBoundingBox.js";
+import { getBoardBoundingBox } from "./getBoardBoundingBox.js";
 
 export const STATE = {
   colorMap: {
@@ -39,6 +43,7 @@ export const STATE = {
   heldKeys: new Set(),
   currentPoint: [0, 0],
   lastPoint: null,
+  PROGRAM_SCALE: 1,
 };
 
 window.STATE = STATE;
@@ -50,9 +55,9 @@ export function setBoard(newBoard) {
     const allShapes = [];
 
     footprint.pads.forEach((pad) => {
-      const pos = pad.position;
+      const pos = pad.position ?? [0, 0];
 
-      pad.traces.forEach((trace) => {
+      pad?.traces?.forEach((trace) => {
         const shapes = contourToShapes(trace.contour).shapes;
         const translatedShapes = translateShapes(shapes, pos);
         trace.shapes = translatedShapes;
@@ -61,7 +66,7 @@ export function setBoard(newBoard) {
         allShapes.push(translatedShapes);
       });
 
-      pad.regions.forEach((region) => {
+      pad?.regions?.forEach((region) => {
         const shapes = contourToShapes(region.contour).shapes;
         const translatedShapes = translateShapes(shapes, pos);
         region.shapes = translatedShapes;
@@ -97,7 +102,7 @@ export function setBoard(newBoard) {
     const flip = comp.flip ?? false;
 
     const pads = [];
-    const componentBoundingBox = {
+    const compBoundingBox = {
       xMin: Infinity,
       xMax: -Infinity,
       yMin: Infinity,
@@ -110,7 +115,7 @@ export function setBoard(newBoard) {
       const traces = [];
       const shapesForBoundingBox = [];
 
-      pad.traces.forEach((trace) => {
+      pad?.traces?.forEach((trace) => {
         const shapes = trace.shapes;
         const newShapes = pipe(
           shapes,
@@ -133,7 +138,7 @@ export function setBoard(newBoard) {
       });
 
       const regions = [];
-      pad.regions.forEach((region) => {
+      pad?.regions?.forEach((region) => {
         const shapes = region.shapes;
         const newShapes = pipe(
           shapes,
@@ -160,6 +165,17 @@ export function setBoard(newBoard) {
 
       const padBBox = getShapesBoundingBox(shapesForBoundingBox);
 
+      if (padBBox.xMin < compBoundingBox.xMin)
+        compBoundingBox.xMin = padBBox.xMin;
+      if (padBBox.xMax > compBoundingBox.xMax)
+        compBoundingBox.xMax = padBBox.xMax;
+      if (padBBox.yMin < compBoundingBox.yMin)
+        compBoundingBox.yMin = padBBox.yMin;
+      if (padBBox.yMax > compBoundingBox.yMax)
+        compBoundingBox.yMax = padBBox.yMax;
+
+      newPad.boundingBox = padBBox;
+
       newPad.position = [
         (padBBox.xMin + padBBox.xMax) / 2,
         (padBBox.yMin + padBBox.yMax) / 2,
@@ -173,13 +189,20 @@ export function setBoard(newBoard) {
     });
 
     comp.pads = pads;
-    comp.boundingBox = componentBoundingBox;
+    comp.boundingBox = compBoundingBox;
+    // comp.boundingBox = pipe(
+    //   footprint.boundingBox,
+    //   (x) => (flip ? flipBoundingBox(x, "horizontal") : x),
+    //   (x) => translateBoundingBox(x, translate),
+    //   (x) => rotateBoundingBox(x, rotate, translate),
+    // );
+    // console.log(footprint.boundingBox, comp.boundingBox);
     comp.translate = translate;
   });
 
   /* PROCESS REGIONS */
 
-  newBoard.regions.forEach((region) => {
+  newBoard?.regions?.forEach((region) => {
     const shapes = contourToShapes(region.contour).shapes;
     region.shapes = shapes;
     region.polarity = region.polarity === undefined ? "+" : region.polarity;
@@ -187,11 +210,15 @@ export function setBoard(newBoard) {
 
   /* PROCESS TRACES */
 
-  newBoard.traces.forEach((trace) => {
+  newBoard?.traces?.forEach((trace) => {
     const shapes = contourToShapes(trace.track).shapes;
     trace.shapes = shapes;
     trace.polarity = trace.polarity === undefined ? "+" : trace.polarity;
   });
+
+  /* BOUNDING BOX */
+
+  newBoard.boundingBox = getBoardBoundingBox(newBoard);
 
   /* PROCESS LAYERS */
 

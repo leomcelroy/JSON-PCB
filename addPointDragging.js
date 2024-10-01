@@ -74,7 +74,7 @@ export function addPointDragging(el) {
       currentPoint = suggestVH(
         controlPoints.filter((x, i) => !selectedPoints().has(i)),
         currentPoint,
-        20,
+        20 / STATE?.panZoomFns?.scale(),
       );
 
     const dx = currentPoint[0] - mousedownPoint[0];
@@ -140,7 +140,7 @@ export function addPointDragging(el) {
     const dx = currentPoint[0] - mousedownPoint[0];
     const dy = currentPoint[1] - mousedownPoint[1];
 
-    if (dx ** 2 + dy ** 2 < 10) {
+    if (dx ** 2 + dy ** 2 < 10 / STATE?.panZoomFns?.scale()) {
       selectedPoints().add(idx);
       if (e.detail === 2) selectedPoints().delete(idx);
       patchState();

@@ -50,7 +50,7 @@ export function addPathCreation(el) {
       const [_, startX, startY] = start;
       const dx = startX - x;
       const dy = startY - y;
-      if (Math.sqrt(dx ** 2 + dy ** 2) < 10) {
+      if (Math.sqrt(dx ** 2 + dy ** 2) < 10 / STATE?.panZoomFns?.scale()) {
         trackOrContour.push(["close"]);
         closed = true;
       } else {

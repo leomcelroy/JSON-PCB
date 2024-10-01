@@ -8,7 +8,7 @@ export function addAndEditPath(type) {
       track: [],
       layer: "F.Cu",
       polarity: "+",
-      thickness: 1,
+      thickness: 0.015,
     };
   }
 
