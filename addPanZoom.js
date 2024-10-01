@@ -108,6 +108,8 @@ export function addPanZoom(el) {
   });
 
   function setScaleXY(limits) {
+    limits.y = limits.y.map((y) => -y).reverse();
+
     const bb = el.getBoundingClientRect();
     const xr = limits.x[1] - limits.x[0];
     const yr = limits.y[1] - limits.y[0];
