@@ -169,7 +169,7 @@ function renderBoardBBox(state) {
   return svg`
     <rect 
       x="${xMin}" 
-      y="${yMin}" 
+      y="${-yMax}" 
       width="${boxWidth}" 
       height="${boxHeight}" 
       fill="none" 
@@ -192,9 +192,9 @@ function renderTempLine(state) {
     result.push(svg`
       <line 
         x1="${lastPoint[0]}" 
-        y1="${lastPoint[1]}" 
+        y1="${-lastPoint[1]}" 
         x2="${currentPoint[0]}" 
-        y2="${currentPoint[1]}" 
+        y2="${-currentPoint[1]}" 
         stroke="blue" 
         stroke-width="2"
         vector-effect="non-scaling-stroke"
@@ -206,7 +206,7 @@ function renderTempLine(state) {
   result.push(svg`
     <circle 
       cx="${currentPoint[0]}" 
-      cy="${currentPoint[1]}" 
+      cy="${-currentPoint[1]}" 
       r="${5 / state?.panZoomFns?.scale()}" 
       fill="green"
     />
@@ -238,6 +238,7 @@ function renderHoverablePaths(state) {
           class="hoverable-path"
           .type=${x.type}
           .index=${x.index}
+          transform="scale(1 -1)"
           />`,
     );
   };
@@ -270,7 +271,7 @@ function renderEditablePath(state) {
         .index=${index}
         r="${5 / state?.panZoomFns?.scale()}" 
         cx=${pt[0]} 
-        cy=${pt[1]} 
+        cy=${-pt[1]} 
         fill="purple"
       />`,
   );
@@ -284,6 +285,7 @@ function renderEditablePath(state) {
       stroke-linecap="round" 
       stroke-linejoin="round" 
       fill="none" 
+      transform="scale(1 -1)"
       />
     ${points}
 

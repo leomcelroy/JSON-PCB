@@ -50,7 +50,7 @@ export function addPanZoom(el) {
     let newX = (x - pointX) / scale;
     let newY = (y - pointY) / scale;
 
-    return [newX, newY];
+    return [newX, -newY];
   }
 
   listen("mousedown", "", (e) => {

@@ -46,7 +46,7 @@ export function renderLayer(tracesRegions, layer, color) {
         ${maskContent}
       </mask>
     </defs>
-    <g mask="url(#mask-${layer})">
+    <g mask="url(#mask-${layer})" transform="scale(1 -1)">
       ${subject}
     </g>
   `;

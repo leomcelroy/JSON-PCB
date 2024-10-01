@@ -21,7 +21,7 @@ export function renderComponents(state) {
       result.push(svg`
         <rect 
           x="${xMin}" 
-          y="${yMin}" 
+          y="${-yMax}" 
           width="${boxWidth}" 
           height="${boxHeight}" 
           fill="none" 
@@ -38,7 +38,7 @@ export function renderComponents(state) {
         result.push(svg`
           <circle 
             cx="${position[0]}" 
-            cy="${position[1]}" 
+            cy="${-position[1]}" 
             r=${drill ? drill.diameter / 2 : 0} 
             fill="white"/>
           `);
@@ -48,12 +48,12 @@ export function renderComponents(state) {
         <circle 
           class="hidden"
           cx="${position[0]}" 
-          cy="${position[1]}" 
+          cy="${-position[1]}" 
           r="${5 / state?.panZoomFns?.scale()}" 
           fill="red"/>
         <text 
           x="${position[0]}" 
-          y="${position[1]}" 
+          y="${-position[1]}" 
           font-size="${13 / state?.panZoomFns?.scale()}" 
           fill="lightgreen"
           opacity=".95"
@@ -69,12 +69,12 @@ export function renderComponents(state) {
         component-control-pt
         .componentId=${id}
         cx="${translate[0]}" 
-        cy="${translate[1]}" 
+        cy="${-translate[1]}" 
         r="${5 / state?.panZoomFns?.scale()}" 
         fill="black"/>
       <text 
         x="${translate[0]}" 
-        y="${translate[1] - 15 / state?.panZoomFns?.scale()}" 
+        y="${-(translate[1] - 15 / state?.panZoomFns?.scale())}" 
         font-size="${12 / state?.panZoomFns?.scale()}" 
         fill="black"
         text-anchor="middle"
