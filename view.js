@@ -5,6 +5,7 @@ import { renderLayerMenu } from "./renderLayerMenu.js";
 import { renderFootprintMenu } from "./renderFootprintMenu.js";
 import { renderComponents } from "./renderComponents.js";
 import { renderEditModal } from "./renderEditModal.js";
+import { addAndEditPath } from "./addAndEditPath.js";
 
 export function view(state) {
   const { layers, colorMap, hoverablePaths, layerOrder, layerNotVisible } =
@@ -30,16 +31,46 @@ export function view(state) {
 
   return html`
     <div class="root">
-      <div class="top-menu">
-        <div>save</div>
-        <div>export</div>
-      </div>
       <div class="left-toolbar">
+        <div class="code-editor"></div>
+      </div>
+      <div class="top-menu">
+        <div>Save</div>
+        <div class="dropdown">
+          <div>Export</div>
+          <div class="dropdown-items">
+            <div>PNG</div>
+            <div>Gerber</div>
+          </div>
+        </div>
+        <div>Edit JSON</div>
+        <div>New File</div>
+        <div class="dropdown">
+          <div>Examples</div>
+          <div class="dropdown-items"></div>
+        </div>
+        <div>Center View</div>
+      </div>
+      <div class="right-toolbar">
         ${renderFootprintMenu(state)}
         <div class="hidden">Edit Netlist</div>
         <div class="menu-buttons-container">
-          <div class="menu-button">Add Trace</div>
-          <div class="menu-button">Add Region</div>
+          <div
+            class="menu-button"
+            @click=${() => {
+              addAndEditPath("traces");
+            }}
+          >
+            Add Trace
+          </div>
+          <div
+            class="menu-button"
+            @click=${() => {
+              addAndEditPath("regions");
+            }}
+          >
+            Add Region
+          </div>
         </div>
         <div class="menu-header menu-title">Layers</div>
         ${renderLayerMenu(state)}
@@ -58,13 +89,49 @@ export function view(state) {
           <g class="transform-group">
             <circle r="5" x="0" y="0" fill="red" />
             ${layersView} ${renderHoverablePaths(state)}
-            ${renderEditablePath(state)} ${renderComponents(state)}
+            ${renderComponents(state)} ${renderTempLine(state)}
+            ${renderEditablePath(state)}
           </g>
         </svg>
         ${renderEditModal(state)}
       </div>
     </div>
   `;
+}
+
+function renderTempLine(state) {
+  if (state.editPath.editMode !== "DRAW") return;
+  if (state.editPath.editing === false) return;
+  if (state.currentPoint === null) return;
+
+  const { currentPoint, lastPoint } = state;
+
+  const result = [];
+
+  if (lastPoint !== null) {
+    result.push(svg`
+      <line 
+        x1="${lastPoint[0]}" 
+        y1="${lastPoint[1]}" 
+        x2="${currentPoint[0]}" 
+        y2="${currentPoint[1]}" 
+        stroke="blue" 
+        stroke-width="2"
+        stroke-dasharray="5, 5" 
+      />
+    `);
+  }
+
+  result.push(svg`
+    <circle 
+      cx="${currentPoint[0]}" 
+      cy="${currentPoint[1]}" 
+      r="5" 
+      fill="green"
+    />
+  `);
+
+  return result;
 }
 
 function renderHoverablePaths(state) {

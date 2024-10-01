@@ -14,7 +14,6 @@ export function renderEditModal(state) {
       <div class="form-group">
         <span>ID:</span>
         <input
-          id="id"
           type="text"
           .value=${comp.id}
           @input=${(e) => {
@@ -28,7 +27,6 @@ export function renderEditModal(state) {
       <div class="form-group">
         <span>Translate X:</span>
         <input
-          id="translateX"
           type="number"
           .value=${comp.translate[0] || 0}
           @input=${(e) => {
@@ -42,7 +40,6 @@ export function renderEditModal(state) {
       <div class="form-group">
         <span>Translate Y:</span>
         <input
-          id="translateY"
           type="number"
           .value=${comp.translate[1] || 0}
           @input=${(e) => {
@@ -56,7 +53,6 @@ export function renderEditModal(state) {
       <div class="form-group">
         <span>Rotate:</span>
         <input
-          id="rotate"
           type="number"
           .value=${comp.rotate || 0}
           @input=${(e) => {
@@ -70,7 +66,6 @@ export function renderEditModal(state) {
       <div class="form-group">
         <span>Flip:</span>
         <input
-          id="flip"
           type="checkbox"
           .checked=${comp.flip}
           @change=${(e) => {
@@ -82,10 +77,123 @@ export function renderEditModal(state) {
     `);
   }
 
+  if (type === "regions") {
+    const region = state.board[type][id];
+    const layerOrder = state.layerOrder;
+    const polarityOptions = ["+", "-"];
+
+    content.push(html`
+      <div class="form-group">
+        <span>Layer</span>
+        <select
+          .value=${region.layer}
+          @change=${(e) => {
+            region.layer = e.target.value;
+            setBoard(state.board);
+          }}
+        >
+          ${layerOrder.map(
+            (layer) =>
+              html`<option value=${layer} ?selected=${region.layer === layer}>
+                ${layer}
+              </option>`,
+          )}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <span>Polarity</span>
+        <select
+          .value=${region.polarity}
+          @change=${(e) => {
+            region.polarity = e.target.value;
+            setBoard(state.board);
+          }}
+        >
+          ${polarityOptions.map(
+            (polarity) =>
+              html`<option
+                value=${polarity}
+                ?selected=${region.polarity === polarity}
+              >
+                ${polarity}
+              </option>`,
+          )}
+        </select>
+      </div>
+    `);
+  }
+
+  if (type === "traces") {
+    const trace = state.board[type][id];
+
+    const layerOrder = state.layerOrder;
+    const polarityOptions = ["+", "-"];
+
+    content.push(html`
+      <div class="form-group">
+        <span>Layer</span>
+        <select
+          .value=${trace.layer}
+          @change=${(e) => {
+            trace.layer = e.target.value;
+            setBoard(state.board);
+          }}
+        >
+          ${layerOrder.map(
+            (layer) =>
+              html`<option value=${layer} ?selected=${trace.layer === layer}>
+                ${layer}
+              </option>`,
+          )}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <span>Polarity</span>
+        <select
+          .value=${trace.polarity}
+          @change=${(e) => {
+            trace.polarity = e.target.value;
+            setBoard(state.board);
+          }}
+        >
+          ${polarityOptions.map(
+            (polarity) =>
+              html`<option
+                value=${polarity}
+                ?selected=${trace.polarity === polarity}
+              >
+                ${polarity}
+              </option>`,
+          )}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <span>Thickness</span>
+        <input
+          type="number"
+          .value=${trace.thickness || 0}
+          @input=${(e) => {
+            const value = Number(e.target.value) || 0;
+            trace.thickness = value;
+            setBoard(state.board);
+          }}
+        />
+      </div>
+    `);
+  }
+
   return html`
     <div class="modal">
       <div class="modal-header">
-        <span class="modal-title">Edit Modal</span>
+        <span class="modal-title"
+          >Edit
+          ${{ components: "Component", regions: "Region", traces: "Trace" }[
+            type
+          ]}</span
+        >
         <button class="modal-close" @click=${() => closeModal()}>✖</button>
       </div>
       <div class="modal-content">${content}</div>
@@ -114,6 +222,7 @@ export function renderEditModal(state) {
     patchState((s) => {
       s.editModal.open = false;
       s.editPath.editing = false;
+      s.editPath.editMode = "SELECT";
     });
   }
 }

@@ -49,7 +49,7 @@ export const testPCB = {
           ],
           layers: ["F.Cu"],
           drill: {
-            diameter: 0.02,
+            diameter: 10,
             start: "F.Cu",
             end: "B.Cu",
             plated: false,
@@ -117,7 +117,7 @@ export const testPCB = {
         ["lineBy", -50, 0, { corner: ["fillet", 10] }],
         ["close"],
       ],
-      polarity: "-",
+      polarity: "+",
       layer: "F.Cu",
     },
 

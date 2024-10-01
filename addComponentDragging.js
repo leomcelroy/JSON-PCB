@@ -20,6 +20,15 @@ export function addComponentDragging(el) {
 
     clickedId = e.target.componentId;
 
+    patchState((s) => {
+      s.editPath.editing = false;
+      s.editModal = {
+        open: true,
+        type: "components",
+        id: clickedId,
+      };
+    });
+
     dragging = true;
     el.panZoomFns.togglePanZoom(true);
   });
@@ -44,14 +53,6 @@ export function addComponentDragging(el) {
     const dy = currentPoint[1] - mousedownPoint[1];
 
     if (dx < 5 && dy < 5) {
-      patchState((s) => {
-        s.editPath.editing = false;
-        s.editModal = {
-          open: true,
-          type: "components",
-          id: clickedId,
-        };
-      });
     }
 
     dragging = false;

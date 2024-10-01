@@ -2,17 +2,14 @@
 
 ## TODO
 
-- modal editors
-  - trace/region editing
-    - layer selection
-    - thickness
-    - deletion
-  - components
-- footprint import
-- path creation
 - path manipulation
   - fillet editing
   - deleting points
+  - adding points on path
+- footprint import
+- footprint drop in
+  - json
+  - kicad
 - edit footprint id
 - top menu
   - save
@@ -26,10 +23,16 @@
   - view json
   - link to github
 - make it look nice
+- json view/editor
+- try to match current layer order
 
+- box select
+- a grid
 - snap to pads
 - netlists
 - pours/keepout zones
+- remove empty traces/regions?
+- add component labels and pad labels to bottom of layer list
 
 ## BUGS
 
@@ -57,8 +60,26 @@
   - display footprints
   - draggable adding
   - footprint delete
+- modal editors
+  - trace/region editing
+    - layer selection
+    - thickness
+    - deletion
+  - components
+- set layers when initializing board
+- path creation
+  - draw preview path
+  - draw preview point
+- holes
 
-### Sat. Sep 28, 2024
+
+### Sep 30, 2024
+
+I need to take into account drill layers and tracks.
+
+I need to think about how to select multiple things at once.
+
+### Sep 28, 2024
 
 I need to add information to pads what should I add?
 In SVG-PCB they had this

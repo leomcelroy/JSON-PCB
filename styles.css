@@ -1,3 +1,6 @@
+:root {
+}
+
 html,
 body {
   padding: 0;
@@ -13,32 +16,47 @@ body {
   width: 100%;
   height: 100%;
   grid-template-rows: auto 1fr; /* Top toolbar takes height of its content, work area fills the rest */
-  grid-template-columns: 1fr 300px; /* Left toolbar is 200px, work area takes the remaining space */
+  grid-template-columns: 1fr 275px; /* Left toolbar is 200px, work area takes the remaining space */
   grid-template-areas:
     "top-toolbar top-toolbar"
-    "workarea left-toolbar";
+    "workarea right-toolbar";
 }
 
 /* Top toolbar styles */
 .top-menu {
   grid-area: top-toolbar;
-  background-color: purple; /* Example background color */
+  background-color: purple;
   padding: 10px;
   box-sizing: border-box;
   display: flex;
   gap: 2rem;
 }
 
+.right-toolbar {
+  grid-area: right-toolbar;
+  background-color: antiquewhite;
+}
+
 .left-toolbar {
   grid-area: left-toolbar;
-  background-color: lightblue; /* Example background color */
-  box-sizing: border-box;
+  height: 100%;
+  overflow: hidden;
+}
+
+.code-editor {
+  height: 100%;
+  overflow: hidden;
+}
+
+.cm-editor {
+  height: 100%;
+  overflow: auto;
 }
 
 /* Work area styles */
 .workarea {
   grid-area: workarea;
-  background-color: lightgreen; /* Example background color */
+  background-color: lightgreen;
   box-sizing: border-box;
   position: relative;
 }

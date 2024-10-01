@@ -18,15 +18,11 @@ export function addComponentAdding(el) {
     (e) => {
       const target = e.target.closest("[draggable-footprint]");
       makePhantom(e, target, (e) => {
-        console.log("dropped", e, getPoint(e));
-
         const dropPoint = getPoint(e);
 
         const workareaSvg = document.querySelector(".workarea-svg");
 
         if (workareaSvg && workareaSvg.contains(e.target)) {
-          console.log("Dropped on workarea-svg");
-
           const svgRect = workareaSvg.getBoundingClientRect();
 
           const relativeX = dropPoint[0] - svgRect.left;
@@ -34,8 +30,6 @@ export function addComponentAdding(el) {
 
           const panZoomFns = workareaSvg.panZoomFns;
           const transformedPoint = panZoomFns.getPoint(relativeX, relativeY);
-
-          console.log(transformedPoint);
 
           let i = 0;
           let possibleId = () => `${target.footprintId}_${i}`;
@@ -50,11 +44,16 @@ export function addComponentAdding(el) {
               translate: transformedPoint,
             };
 
-            console.log(newComp);
-
             s.board.components.push(newComp);
 
             setBoard(s.board);
+
+            s.editPath.editing = false;
+            s.editModal = {
+              open: true,
+              type: "components",
+              id: newComp.id,
+            };
           });
         }
       });

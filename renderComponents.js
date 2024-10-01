@@ -27,7 +27,7 @@ export function renderComponents(state) {
     `);
 
     pads.forEach((pad) => {
-      const { id: padId, position } = pad;
+      const { id: padId, position, drill } = pad;
 
       result.push(svg`
         <circle 
@@ -36,11 +36,19 @@ export function renderComponents(state) {
           cy="${position[1]}" 
           r="5" 
           fill="red"/>
+        <circle 
+          cx="${position[0]}" 
+          cy="${position[1]}" 
+          r=${drill ? drill.diameter / 2 : 0} 
+          fill="white"/>
         <text 
           x="${position[0]}" 
           y="${position[1]}" 
-          font-size="12" 
-          fill="yellow"
+          font-size="13" 
+          fill="lightgreen"
+          opacity=".95"
+          stroke="black" 
+          stroke-width=".5"
           text-anchor="middle"
           dominant-baseline="middle">${padId}</text>
       `);

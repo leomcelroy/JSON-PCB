@@ -3,7 +3,6 @@ import { testPCB } from "./testPCB.js";
 import { getLayers } from "./getLayers.js";
 import { contourToShapes } from "./contourToShapes.js";
 import { shapesToPathData } from "./renderShapesToSVG.js";
-
 import { view } from "./view.js";
 import {
   translateShapes,
@@ -20,7 +19,7 @@ export const STATE = {
     "F.Cu": "#0000ffff",
     "B.Cu": "#ff0000ff",
   },
-  layerOrder: ["F.Cu", "B.Cu"],
+  layerOrder: [],
   layerNotVisible: new Set(),
   board: null,
   layers: null,
@@ -38,13 +37,13 @@ export const STATE = {
   },
   panZoomFns: null,
   heldKeys: new Set(),
+  currentPoint: [0, 0],
+  lastPoint: null,
 };
 
 window.STATE = STATE;
 
 export function setBoard(newBoard) {
-  STATE.board = newBoard;
-
   /* PROCESS FOOTPRINTS */
 
   newBoard.footprints.forEach((footprint) => {
@@ -57,6 +56,7 @@ export function setBoard(newBoard) {
         const shapes = contourToShapes(trace.contour).shapes;
         const translatedShapes = translateShapes(shapes, pos);
         trace.shapes = translatedShapes;
+        trace.polarity = trace.polarity === undefined ? "+" : trace.polarity;
 
         allShapes.push(translatedShapes);
       });
@@ -65,6 +65,7 @@ export function setBoard(newBoard) {
         const shapes = contourToShapes(region.contour).shapes;
         const translatedShapes = translateShapes(shapes, pos);
         region.shapes = translatedShapes;
+        region.polarity = region.polarity === undefined ? "+" : region.polarity;
 
         allShapes.push(translatedShapes);
       });
@@ -166,6 +167,8 @@ export function setBoard(newBoard) {
 
       newPad.id = pad.id;
 
+      newPad.drill = pad.drill;
+
       pads.push(newPad);
     });
 
@@ -179,6 +182,7 @@ export function setBoard(newBoard) {
   newBoard.regions.forEach((region) => {
     const shapes = contourToShapes(region.contour).shapes;
     region.shapes = shapes;
+    region.polarity = region.polarity === undefined ? "+" : region.polarity;
   });
 
   /* PROCESS TRACES */
@@ -186,17 +190,40 @@ export function setBoard(newBoard) {
   newBoard.traces.forEach((trace) => {
     const shapes = contourToShapes(trace.track).shapes;
     trace.shapes = shapes;
+    trace.polarity = trace.polarity === undefined ? "+" : trace.polarity;
   });
 
   /* PROCESS LAYERS */
 
   STATE.layers = getLayers(newBoard);
+  const oldLayers = STATE.layerOrder;
+  const newLayers = Object.keys(STATE.layers);
+
+  // TODO: try to match current layer order
+
+  const MINIMUM_LAYERS = ["F.Cu", "B.Cu", "outline"];
+
+  MINIMUM_LAYERS.forEach((l) => {
+    if (newLayers.includes(l)) return;
+
+    newLayers.push(l);
+  });
+
+  newLayers.forEach((layer) => {
+    if (!(layer in STATE.colorMap)) {
+      STATE.colorMap[layer] = "#000000ff";
+    }
+  });
+
+  STATE.layerOrder = reorderList(newLayers, oldLayers);
 
   /* PROCESS HOVERABLE PATHS */
 
   STATE.hoverablePaths = getHoverablePaths(newBoard);
 
   /* RENDER */
+
+  STATE.board = newBoard;
 
   render(STATE);
 }
@@ -250,3 +277,51 @@ function swapFB(inputString) {
     .replace(/TEMP/g, "B.");
   return result;
 }
+
+function reorderList(list1, list2) {
+  // Create a Map to store indices of elements in list2
+  const orderMap = new Map(list2.map((item, index) => [item, index]));
+
+  // Sort list1 based on the order in list2
+  const sortedList = [...list1].sort((a, b) => {
+    const indexA = orderMap.has(a) ? orderMap.get(a) : Infinity;
+    const indexB = orderMap.has(b) ? orderMap.get(b) : Infinity;
+    return indexA - indexB;
+  });
+
+  // Add items from list2 that are not in list1
+  const result = [
+    ...sortedList,
+    ...list2.filter((item) => !list1.includes(item)),
+  ];
+
+  return result;
+}
+
+/* SET JSON */
+
+//   const editor = document.querySelector(".code-editor");
+
+//   const view = editor.cm;
+
+//   const newText = JSON.stringify(
+//     newBoard,
+//     (key, value) => {
+//       if (key === "shapes") return undefined;
+//       if (key === "boundingBox") return undefined;
+//       if (key === "pathData") return undefined;
+
+//       return value;
+//     },
+//     2,
+//   );
+
+//   console.time();
+//   setContent(view, newText);
+//   console.timeEnd();
+
+// function setContent(view, newContent) {
+//   view.dispatch({
+//     changes: { from: 0, to: view.state.doc.length, insert: newContent },
+//   });
+// }

@@ -1,0 +1,129 @@
+import { patchState, STATE, setBoard } from "./state.js";
+import { contourToShapes } from "./contourToShapes.js";
+
+export function addPathCreation(el) {
+  function getPoint(e) {
+    let rect = el.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    return el.panZoomFns.getPoint(x, y);
+  }
+
+  const listener = createListener(el);
+
+  let currentPoint = [0, 0];
+
+  let metaPressed = false;
+
+  const isMetaPressed = () => metaPressed;
+
+  const getTool = () => STATE.editPath.editMode;
+  const selectedPoints = () => STATE.editPath.selectedPoints;
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Meta") {
+      metaPressed = true;
+    }
+  });
+
+  window.addEventListener("keyup", (e) => {
+    if (e.key === "Meta") {
+      metaPressed = false;
+    }
+  });
+
+  listener("mousedown", "", (e) => {
+    if (getTool() !== "DRAW") return;
+
+    const { type, index } = STATE.editPath.data;
+    const traceOrRegion = STATE.board[type][index];
+    const trackOrContour =
+      traceOrRegion[type === "traces" ? "track" : "contour"];
+
+    const [x, y] = currentPoint;
+    let closed = false;
+    if (trackOrContour.length === 0) {
+      trackOrContour.push(["start", x, y]);
+    } else {
+      const start = trackOrContour[0];
+      const [_, startX, startY] = start;
+      const dx = startX - x;
+      const dy = startY - y;
+      if (Math.sqrt(dx ** 2 + dy ** 2) < 10) {
+        trackOrContour.push(["close"]);
+        closed = true;
+      } else {
+        trackOrContour.push(["lineTo", x, y]);
+      }
+    }
+
+    const newData = contourToShapes(trackOrContour);
+    traceOrRegion.shapes = newData.shapes;
+
+    patchState((s) => {
+      if (closed) s.editPath.editMode = "SELECT";
+      s.editPath.data.trackOrContourData = newData;
+    });
+
+    setBoard(STATE.board);
+  });
+
+  listener("mousemove", "", (e) => {
+    currentPoint = getPoint(e);
+
+    patchState((s) => {
+      s.currentPoint = currentPoint;
+      let lastPoint = null;
+      if (s?.editPath?.data?.trackOrContourData) {
+        const controlPoints =
+          s?.editPath?.data?.trackOrContourData.controlPoints;
+        if (controlPoints.length > 0) lastPoint = controlPoints.at(-1);
+      }
+      s.lastPoint = lastPoint;
+    });
+
+    // if (!isMetaPressed())
+    //   currentPoint = suggestVH(
+    //     controlPoints.filter((x, i) => !selectedPoints().has(i)),
+    //     currentPoint,
+    //     20,
+    //   );
+  });
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      patchState((s) => {
+        s.editPath.editMode = "SELECT";
+      });
+    }
+  });
+}
+
+const trigger = (e) => e.composedPath()[0];
+const matchesTrigger = (e, selectorString) =>
+  trigger(e).matches(selectorString);
+const createListener = (target) => (eventName, selectorString, event) => {
+  target.addEventListener(eventName, (e) => {
+    if (selectorString === "" || matchesTrigger(e, selectorString)) event(e);
+  });
+};
+
+function suggestVH(points, newPoint, tolerance) {
+  const [newX, newY] = newPoint;
+
+  let suggestedX = newX;
+  let suggestedY = newY;
+
+  points.forEach(([x, y], index) => {
+    if (Math.abs(x - newX) <= tolerance) {
+      suggestedX = x;
+    }
+
+    if (Math.abs(y - newY) <= tolerance) {
+      suggestedY = y;
+    }
+  });
+
+  return [suggestedX, suggestedY];
+}
