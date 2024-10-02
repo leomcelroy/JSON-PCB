@@ -77,7 +77,7 @@ export function renderLayerMenu(state) {
   return html`
     <div class="layer-menu-container">
       ${layerOrder.map(renderLayerItem)}
-      <div style="margin: 0px 5px;" class="bg-item">
+      <div class="bg-item">
         <div class="layer-name">Background</div>
         <color-picker
           @colorChange=${(e) => {

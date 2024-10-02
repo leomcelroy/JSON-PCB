@@ -72,6 +72,7 @@ export function renderComponents(state) {
           stroke-width=".8"
           vector-effect="non-scaling-stroke"
           text-anchor="middle"
+          style="pointer-events: none;"
           dominant-baseline="middle">${padId}</text>
       `);
     });
@@ -94,6 +95,7 @@ export function renderComponents(state) {
         font-size="${12 / (state?.panZoomFns?.scale() ?? 1)}" 
         fill="black"
         text-anchor="middle"
+        style="pointer-events: none;"
         dominant-baseline="middle">${id}</text>
     `);
   });

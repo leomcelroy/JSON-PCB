@@ -140,7 +140,7 @@ export function addPointDragging(el) {
     const dx = currentPoint[0] - mousedownPoint[0];
     const dy = currentPoint[1] - mousedownPoint[1];
 
-    if (dx ** 2 + dy ** 2 < 10 / STATE?.panZoomFns?.scale()) {
+    if (dx ** 2 + dy ** 2 < 0.1 / STATE?.panZoomFns?.scale()) {
       selectedPoints().add(idx);
       if (e.detail === 2) selectedPoints().delete(idx);
       patchState();

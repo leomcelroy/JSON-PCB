@@ -269,7 +269,7 @@ body {
   flex-direction: column;
   gap: 3px;
   padding: 0px 5px;
-  max-height: 30%;
+  /*  max-height: 30%;*/
   /*  overflow: auto;*/
 }
 
