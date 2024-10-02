@@ -67,6 +67,7 @@ function init(state) {
     state.heldKeys.add(e.key);
 
     if (e.key === "Backspace") {
+      if (e.target.matches("input")) return;
       const deleteBtn = document.querySelector(".delete-button");
       if (deleteBtn) deleteBtn.click();
     }
