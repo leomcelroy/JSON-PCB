@@ -3,7 +3,7 @@
 to run 
 
 ```
-npm instal
+npm install
 npm run dev
 ```
 
