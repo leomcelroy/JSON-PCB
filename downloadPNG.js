@@ -2,7 +2,7 @@ import { changeDpiDataUrl } from "./changeDPI.js";
 import { getBoardBoundingBox } from "./getBoardBoundingBox.js";
 import { drawLayer } from "./drawLayer.js";
 
-export function downloadPNG(state, dpi = 1000) {
+export function downloadPNG(state, name, dpi = 1000) {
   const { layers, colorMap, layerOrder, layerNotVisible, panZoomFns } = state;
 
   const boundingBox = getBoardBoundingBox(state.board);
@@ -96,7 +96,7 @@ export function downloadPNG(state, dpi = 1000) {
   //   canvas.remove();
   // }, 2000);
 
-  dlCanvas(canvas, `anon`);
+  dlCanvas(canvas, `${name}.png`);
 }
 
 function dlCanvas(canvas, name) {

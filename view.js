@@ -79,10 +79,9 @@ export function view(state) {
             <div
               class="dropdown-item"
               @click=${(e) => {
-                // create canvas that is size of board with some margin
-                // render layers to that canvas
-                // done
-                downloadPNG(state);
+                let name = prompt("Please name your PNG.");
+                if (!name) name = "anon";
+                downloadPNG(state, name);
                 patchState();
               }}
             >

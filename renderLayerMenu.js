@@ -75,17 +75,19 @@ export function renderLayerMenu(state) {
   };
 
   return html`
-    <div class="layer-menu-container">${layerOrder.map(renderLayerItem)}</div>
-    <div style="margin: 0px 5px;" class="bg-item">
-      <div class="layer-name">Background</div>
-      <color-picker
-        @colorChange=${(e) => {
-          const newColor = e.detail.value;
-          document.documentElement.style.setProperty("--svg-bg", newColor);
-        }}
-        value=${getComputedStyle(document.body).getPropertyValue("--svg-bg")}
-        class="color-picker"
-      ></color-picker>
+    <div class="layer-menu-container">
+      ${layerOrder.map(renderLayerItem)}
+      <div style="margin: 0px 5px;" class="bg-item">
+        <div class="layer-name">Background</div>
+        <color-picker
+          @colorChange=${(e) => {
+            const newColor = e.detail.value;
+            document.documentElement.style.setProperty("--svg-bg", newColor);
+          }}
+          value=${getComputedStyle(document.body).getPropertyValue("--svg-bg")}
+          class="color-picker"
+        ></color-picker>
+      </div>
     </div>
   `;
 }
