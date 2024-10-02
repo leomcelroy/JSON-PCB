@@ -38,18 +38,18 @@ export function renderFootprintMenu(state) {
 
         <div class="footprint-name">${id}</div>
 
-        <div footprint-delete-btn class="delete-btn" .footprintId=${id}>x</div>
+        <div footprint-delete-btn class="delete-btn" .footprintId=${id}>
+          <i class="fa-solid fa-xmark"></i>
+        </div>
       </div>
     `);
   });
 
   return html`
-    <div>
-      <div class="menu-header">
-        <div class="menu-title">Footprints</div>
-        <button class="import-btn">Import</button>
-      </div>
-      <div class="footprints-list">${results}</div>
+    <div class="menu-header">
+      <div class="menu-title">Footprints</div>
+      <button class="hidden import-btn">Import</button>
     </div>
+    <div class="footprints-list">${results}</div>
   `;
 }

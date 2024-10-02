@@ -53,19 +53,28 @@ export function renderLayerMenu(state) {
           layers: layerOrder,
         }}
       >
-        <div class="layer-grabber">≡</div>
         <div class="layer-name">
-          <input
-            @input=${onVisibilityChange}
-            type="checkbox"
-            .checked=${visible}
-          />
+          <label style="display: flex; align-items: center;">
+            <i
+              style="color: #666161;"
+              class="fa-sm fa-solid ${visible ? "fa-eye" : "fa-eye-slash"}"
+            ></i>
+            <input
+              class="hidden"
+              @input=${onVisibilityChange}
+              type="checkbox"
+              .checked=${visible}
+            />
+          </label>
           <span>${layer}</span>
         </div>
         ${colorInput}
+        <div class="layer-grabber">≡</div>
       </div>
     `;
   };
 
-  return layerOrder.map(renderLayerItem);
+  return html`
+    <div class="layer-menu-container">${layerOrder.map(renderLayerItem)}</div>
+  `;
 }

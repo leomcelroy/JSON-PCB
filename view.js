@@ -9,6 +9,7 @@ import { addAndEditPath } from "./addAndEditPath.js";
 import { jsonPopUp } from "./jsonPopUp.js";
 import { setBoard } from "./state.js";
 import { formatCode } from "./formatCode.js";
+import { getBoardBoundingBox } from "./getBoardBoundingBox.js";
 
 export function view(state) {
   const { layers, colorMap, hoverablePaths, layerOrder, layerNotVisible } =
@@ -16,21 +17,21 @@ export function view(state) {
 
   const layersView = [];
 
-  if (layers) {
-    // Sort layers based on the order in layerOrder string
-    Object.entries(layers)
-      .sort(([layerA], [layerB]) => {
-        const indexA = layerOrder.indexOf(layerA);
-        const indexB = layerOrder.indexOf(layerB);
-        return indexB - indexA;
-      })
-      .forEach(([layer, tracesRegions]) => {
-        if (layerNotVisible.has(layer)) return;
+  // if (layers) {
+  //   // Sort layers based on the order in layerOrder string
+  //   Object.entries(layers)
+  //     .sort(([layerA], [layerB]) => {
+  //       const indexA = layerOrder.indexOf(layerA);
+  //       const indexB = layerOrder.indexOf(layerB);
+  //       return indexB - indexA;
+  //     })
+  //     .forEach(([layer, tracesRegions]) => {
+  //       if (layerNotVisible.has(layer)) return;
 
-        const layerView = renderLayer(tracesRegions, layer, colorMap[layer]);
-        layersView.push(layerView);
-      });
-  }
+  //       const layerView = renderLayer(tracesRegions, layer, colorMap[layer]);
+  //       layersView.push(layerView);
+  //     });
+  // }
 
   return html`
     <div class="root">
@@ -52,6 +53,12 @@ export function view(state) {
         <div
           class="menu-item"
           @click=${(e) => {
+            const data = JSON.parse(JSON.stringify(state.board));
+
+            data.components.forEach((comp) => {
+              delete comp.pads;
+            });
+
             function removeExtraData(key, value) {
               if (key === "shapes") return undefined;
               if (key === "boundingBox") return undefined;
@@ -60,9 +67,7 @@ export function view(state) {
               return value;
             }
 
-            const newText = formatCode(
-              JSON.stringify(state.board, removeExtraData),
-            );
+            const newText = formatCode(JSON.stringify(data, removeExtraData));
 
             jsonPopUp({
               text: newText,
@@ -86,6 +91,7 @@ export function view(state) {
           class="menu-item"
           @click=${(e) => {
             const board = state.board;
+            board.boundingBox = getBoardBoundingBox(board);
             const svg = document.querySelector(".workarea-svg");
             const boundingBox = board.boundingBox;
 
@@ -101,6 +107,10 @@ export function view(state) {
       <div class="right-toolbar">
         ${renderFootprintMenu(state)}
         <div class="hidden">Edit Netlist</div>
+
+        <div class="menu-header menu-title">Layers</div>
+        ${renderLayerMenu(state)}
+
         <div class="menu-buttons-container">
           <div
             class="menu-button"
@@ -119,12 +129,13 @@ export function view(state) {
             Add Region
           </div>
         </div>
-        <div class="menu-header menu-title">Layers</div>
-        ${renderLayerMenu(state)}
       </div>
       <div class="workarea no-select">
+        <canvas class="workarea-canvas-temp"></canvas>
+        <canvas class="workarea-canvas"></canvas>
         <svg class="workarea-svg">
           <rect
+            class="hidden"
             id="bg-mask"
             x="-10000"
             y="-10000"
@@ -133,11 +144,12 @@ export function view(state) {
             fill="white"
           />
           <rect
+            class="hidden"
             x="-10000"
             y="-10000"
             width="20000"
             height="20000"
-            fill="lightgrey"
+            fill="var(--svg-bg)"
           />
 
           <g class="transform-group">
@@ -195,7 +207,7 @@ function renderTempLine(state) {
         y1="${-lastPoint[1]}" 
         x2="${currentPoint[0]}" 
         y2="${-currentPoint[1]}" 
-        stroke="blue" 
+        stroke="black" 
         stroke-width="2"
         vector-effect="non-scaling-stroke"
         stroke-dasharray="5, 5" 
@@ -208,7 +220,10 @@ function renderTempLine(state) {
       cx="${currentPoint[0]}" 
       cy="${-currentPoint[1]}" 
       r="${5 / (state?.panZoomFns?.scale() ?? 1)}" 
-      fill="green"
+      fill="white"
+      stroke="black"
+      vector-effect="non-scaling-stroke"
+      stroke-width="2"
     />
   `);
 
@@ -236,8 +251,8 @@ function renderHoverablePaths(state) {
           stroke-linecap="round" 
           stroke-linejoin="round" 
           class="hoverable-path"
-          .type=${x.type}
-          .index=${x.index}
+          data-type=${x.type}
+          data-index=${x.index}
           transform="scale(1 -1)"
           />`,
     );
@@ -266,13 +281,16 @@ function renderEditablePath(state) {
       svg`<circle 
         path-control-point
         ?selected-control-pt=${state.editPath.selectedPoints.has(i)} 
-        .pointIdx=${i}
-        .type=${type}
-        .index=${index}
+        data-pointIdx=${i}
+        data-type=${type}
+        data-index=${index}
         r="${5 / (state?.panZoomFns?.scale() ?? 1)}" 
         cx=${pt[0]} 
         cy=${-pt[1]} 
-        fill="purple"
+        fill="white"
+        stroke="black"
+        vector-effect="non-scaling-stroke"
+        stroke-width="2"
       />`,
   );
 
@@ -280,7 +298,17 @@ function renderEditablePath(state) {
     <path 
       d=${d} 
       stroke="black" 
-      stroke-width="5" 
+      stroke-width="7" 
+      vector-effect="non-scaling-stroke"
+      stroke-linecap="round" 
+      stroke-linejoin="round" 
+      fill="none" 
+      transform="scale(1 -1)"
+      />
+    <path 
+      d=${d} 
+      stroke="white" 
+      stroke-width="3" 
       vector-effect="non-scaling-stroke"
       stroke-linecap="round" 
       stroke-linejoin="round" 

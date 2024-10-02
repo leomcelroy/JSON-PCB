@@ -2,28 +2,29 @@
 
 ## TODO
 
+- use arcs when converting kicad modules
 - path manipulation
   - fillet editing
   - deleting points
   - adding points on path
-- footprint import
-- footprint drop in
-  - json
-  - kicad
-- edit footprint id
+- edit footprint id!!!!!!!!
 - top menu
   - save
   - export
     - json
-    - png
+    - png!!!!!!!!!
     - gerber?
-  - new file
+  - new file!!!!!!!!
   - examples
   - [x] center view
   - [x] view json
   - link to github
 - make it look nice
 - log mouse position in the corner
+- make sure board bounding box is updated when dragging elements
+  - update bounding box when centering
+- overflow layer menu
+- json editor button color
 
 - box select
 - a grid
@@ -33,6 +34,7 @@
 - remove empty traces/regions?
 - add component labels and pad labels to bottom of layer list
 
+
 ## BUGS
 
 - when I click a hoverable path another one flashes
@@ -40,6 +42,10 @@
 
 ## DONE
 
+- footprint import
+- footprint drop in
+  - ? json
+  - kicad
 - try to match current layer order
 - json view/editor
 - display component labels

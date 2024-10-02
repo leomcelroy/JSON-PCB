@@ -17,7 +17,7 @@ export function addComponentAdding(el) {
     "[draggable-footprint], [draggable-footprint] *",
     (e) => {
       const target = e.target.closest("[draggable-footprint]");
-      makePhantom(e, target, (e) => {
+      const phantom = makePhantom(e, target, (e) => {
         const dropPoint = getPoint(e);
 
         const workareaSvg = document.querySelector(".workarea-svg");
@@ -57,6 +57,9 @@ export function addComponentAdding(el) {
           });
         }
       });
+
+      phantom.style.background = "none";
+      phantom.style.border = "none";
     },
   );
 }

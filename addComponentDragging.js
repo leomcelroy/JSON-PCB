@@ -1,4 +1,6 @@
 import { patchState, setBoard } from "./state.js";
+import { processComponent } from "./processComponent.js";
+import { getLayers } from "./getLayers.js";
 
 export function addComponentDragging(el) {
   function getPoint(e) {
@@ -18,7 +20,7 @@ export function addComponentDragging(el) {
   listener("mousedown", "[component-control-pt]", (e) => {
     mousedownPoint = getPoint(e);
 
-    clickedId = e.target.componentId;
+    clickedId = e.target.dataset.componentId;
 
     patchState((s) => {
       s.editPath.editing = false;
@@ -41,7 +43,16 @@ export function addComponentDragging(el) {
     patchState((s) => {
       const comp = s.board.components.find((x) => x.id === clickedId);
       comp.translate = currentPoint;
-      setBoard(s.board);
+
+      // is there a way to do less here
+      // i need to update the component
+      // and the bounding box of the component
+      // and layers
+      // setBoard(s.board);
+      const newComp = processComponent(comp, s.board);
+      const index = s.board.components.findIndex((x) => x.id === clickedId);
+      s.board.components[index] = newComp;
+      s.layers = getLayers(s.board);
     });
   });
 

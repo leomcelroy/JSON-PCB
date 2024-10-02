@@ -4,7 +4,7 @@ export function makePhantom(event, el, onDrop) {
     let offsetY = 0;
     let clonedElement = null;
 
-    startDrag(event);
+    return startDrag(event);
 
     function startDrag(e) {
         // Prevent default to stop text selection, etc.
@@ -26,6 +26,7 @@ export function makePhantom(event, el, onDrop) {
             clonedElement.style.width = `${el.getBoundingClientRect().width}px`;
         }
 
+        clonedElement.style.zIndex = "10000";
         clonedElement.style.position = "absolute";
         clonedElement.style.pointerEvents = "none"; // Make it non-interactive
         document.body.appendChild(clonedElement);
@@ -36,6 +37,8 @@ export function makePhantom(event, el, onDrop) {
         // Listen for mousemove and mouseup events
         document.addEventListener("mousemove", updateElementPosition);
         document.addEventListener("mouseup", stopDrag);
+
+        return clonedElement;
     }
 
     function updateElementPosition(e) {

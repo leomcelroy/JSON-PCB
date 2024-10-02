@@ -23,7 +23,7 @@ export function jsonPopUp(ops) {
           background-color: #f4eeee;
           border: 1px solid #ccc;
           padding: 5px;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          box-shadow: 0px 0px 8px 0px #0000006e;
           z-index: 1000;
           width: 70%;
           border-radius: 8px;

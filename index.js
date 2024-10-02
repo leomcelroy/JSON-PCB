@@ -1,4 +1,4 @@
-import { STATE, setBoard, patchState } from "./state.js";
+import { STATE, setBoard, patchState, renderLoop } from "./state.js";
 import { addPanZoom } from "./addPanZoom.js";
 import { addPointDragging } from "./addPointDragging.js";
 import { addComponentDragging } from "./addComponentDragging.js";
@@ -13,11 +13,14 @@ import { view } from "./view.js";
 import { render as r } from "lit-html";
 import { testPCB } from "./testPCB.js";
 import { contourToShapes } from "./contourToShapes.js";
-import { kicadParse } from "./kicadParse.js";
+import { kicadParse } from "./kicadParse-0.js";
 
 function init(state) {
   // render app immediately
   r(view(state), document.body);
+
+  resizeCanvas();
+  // renderLoop();
 
   const svg = document.querySelector(".workarea-svg");
 
@@ -37,14 +40,20 @@ function init(state) {
     },
   });
 
-  // initCodeEditor(document.querySelector(".code-editor"));
-
   const panZoomFns = addPanZoom(svg);
 
   svg.panZoomFns = panZoomFns;
   state.panZoomFns = panZoomFns;
 
   setBoard(testPCB);
+
+  const board = state.board;
+  const boundingBox = board.boundingBox;
+
+  svg.panZoomFns.setScaleXY({
+    x: [boundingBox.xMin, boundingBox.xMax],
+    y: [boundingBox.yMin, boundingBox.yMax],
+  });
 
   window.addEventListener("keydown", (e) => {
     state.heldKeys.add(e.key);
@@ -58,8 +67,8 @@ function init(state) {
   const listenBody = createListener(document.body);
 
   listenSVG("mousedown", ".hoverable-path", (e) => {
-    const type = e.target.type;
-    const index = e.target.index;
+    const type = e.target.dataset.type;
+    const index = e.target.dataset.index;
     const traceOrRegion = state.board[type][index];
     const trackOrContour = traceOrRegion.track || traceOrRegion.contour;
     const trackOrContourData = contourToShapes(trackOrContour);
@@ -84,14 +93,19 @@ function init(state) {
     });
   });
 
-  listenBody("mousedown", "[footprint-delete-btn]", (e) => {
-    const id = e.target.footprintId;
+  listenBody(
+    "mousedown",
+    "[footprint-delete-btn], [footprint-delete-btn] *",
+    (e) => {
+      const btn = e.target.closest("[footprint-delete-btn]");
+      const id = btn.footprintId;
 
-    patchState((s) => {
-      s.board.footprints = s.board.footprints.filter((x) => x.id !== id);
-      setBoard(s.board);
-    });
-  });
+      patchState((s) => {
+        s.board.footprints = s.board.footprints.filter((x) => x.id !== id);
+        setBoard(s.board);
+      });
+    },
+  );
 }
 
 const trigger = (e) => e.composedPath()[0];
@@ -109,3 +123,13 @@ const createListener = (target) => (eventName, selectorString, event) => {
 window.addEventListener("DOMContentLoaded", (e) => {
   init(STATE);
 });
+
+function resizeCanvas() {
+  const canvas = document.querySelector(".workarea-canvas");
+  const canvasBB = canvas.getBoundingClientRect();
+  canvas.width = canvasBB.width;
+  canvas.height = canvasBB.height;
+  patchState();
+}
+
+window.addEventListener("resize", resizeCanvas);

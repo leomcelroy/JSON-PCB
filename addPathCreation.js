@@ -70,6 +70,7 @@ export function addPathCreation(el) {
   });
 
   listener("mousemove", "", (e) => {
+    if (getTool() !== "DRAW") return;
     currentPoint = getPoint(e);
 
     patchState((s) => {

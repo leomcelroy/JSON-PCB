@@ -79,3 +79,21 @@ export function renderShapesToSVG(shapes, ops = {}) {
     class=${className}
     />`;
 }
+
+export function renderPathDataToSVG(pathData, ops = {}) {
+  const strokeWidth = ops.strokeWidth || 0;
+  const stroke = ops.stroke || "none";
+  const fill = ops.fill || "none";
+  const className = ops.class || "";
+
+  // Return the SVG path element
+  return svg`<path 
+    d=${pathData} 
+    fill=${fill} 
+    stroke=${stroke} 
+    stroke-width=${strokeWidth} 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+    class=${className}
+    />`;
+}

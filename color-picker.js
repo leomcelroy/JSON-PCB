@@ -118,6 +118,7 @@ class ColorPicker extends HTMLElement {
                 height: 100%;
                 cursor: pointer;
                 background: none;
+                border-radius: 50%;
             }
             .color-popup {
                 position: absolute;
@@ -135,6 +136,7 @@ class ColorPicker extends HTMLElement {
                 flex-direction: column;
                 align-items: center;
                 justify-content: space-evenly;
+                box-shadow: 0px 0px 8px 0px #0000006e;
             }
             .active {
                 display: flex;

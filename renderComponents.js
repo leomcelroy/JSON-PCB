@@ -24,8 +24,19 @@ export function renderComponents(state) {
           y="${-yMax}" 
           width="${boxWidth}" 
           height="${boxHeight}" 
-          fill="none" 
-          stroke="red" 
+          fill="none"
+          stroke-width="7" 
+          stroke="black" 
+          vector-effect="non-scaling-stroke"
+          stroke-dasharray="5, 5"/>
+        <rect 
+          x="${xMin}" 
+          y="${-yMax}" 
+          width="${boxWidth}" 
+          height="${boxHeight}" 
+          fill="none"
+          stroke-width="3" 
+          stroke="white" 
           vector-effect="non-scaling-stroke"
           stroke-dasharray="5, 5"/>
         `);
@@ -40,7 +51,7 @@ export function renderComponents(state) {
             cx="${position[0]}" 
             cy="${-position[1]}" 
             r=${drill ? drill.diameter / 2 : 0} 
-            fill="white"/>
+            fill="var(--svg-bg)"/>
           `);
       }
 
@@ -54,11 +65,12 @@ export function renderComponents(state) {
         <text 
           x="${position[0]}" 
           y="${-position[1]}" 
-          font-size="${13 / (state?.panZoomFns?.scale() ?? 1)}" 
-          fill="lightgreen"
+          font-size="${14 / (state?.panZoomFns?.scale() ?? 1)}" 
+          fill="white"
           opacity=".95"
           stroke="black" 
-          stroke-width="${0.5 / (state?.panZoomFns?.scale() ?? 1)}"
+          stroke-width=".8"
+          vector-effect="non-scaling-stroke"
           text-anchor="middle"
           dominant-baseline="middle">${padId}</text>
       `);
@@ -67,11 +79,15 @@ export function renderComponents(state) {
     result.push(svg`
       <circle 
         component-control-pt
-        .componentId=${id}
+        data-componentId=${id}
         cx="${translate[0]}" 
         cy="${-translate[1]}" 
         r="${5 / (state?.panZoomFns?.scale() ?? 1)}" 
-        fill="black"/>
+        fill="white"
+        stroke="black"
+        vector-effect="non-scaling-stroke"
+        stroke-width="2"
+        />
       <text 
         x="${translate[0]}" 
         y="${-(translate[1] + 15 / (state?.panZoomFns?.scale() ?? 1))}" 

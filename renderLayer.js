@@ -1,4 +1,4 @@
-import { renderShapesToSVG } from "./renderShapesToSVG.js";
+import { renderShapesToSVG, renderPathDataToSVG } from "./renderShapesToSVG.js";
 import { svg } from "lit-html";
 
 export function renderLayer(tracesRegions, layer, color) {
@@ -9,34 +9,51 @@ export function renderLayer(tracesRegions, layer, color) {
 
   // Build subject (positive shapes)
   positive.regions.forEach((x) => {
-    const shapes = x.shapes;
-    subject.push(renderShapesToSVG(shapes, { fill: color }));
+    // const shapes = x.shapes;
+    // subject.push(renderShapesToSVG(shapes, { fill: color }));
+
+    subject.push(renderPathDataToSVG(x.pathData, { fill: color }));
   });
 
-  positive.traces.forEach((trace) => {
-    const shapes = trace.shapes;
+  positive.traces.forEach((x) => {
+    // const shapes = trace.shapes;
+    // subject.push(
+    //   renderShapesToSVG(shapes, {
+    //     stroke: color,
+    //     strokeWidth: trace.thickness,
+    //   }),
+    // );
+
     subject.push(
-      renderShapesToSVG(shapes, {
+      renderPathDataToSVG(x.pathData, {
         stroke: color,
-        strokeWidth: trace.thickness,
+        strokeWidth: x.thickness,
       }),
     );
   });
 
   // Mask out the negative shapes by filling them with black
   negative.regions.forEach((x) => {
-    const shapes = x.shapes;
-    const newPath = renderShapesToSVG(shapes, { fill: "black" }); // Black will mask out this area
-    maskContent.push(newPath);
+    // const shapes = x.shapes;
+    // const newPath = renderShapesToSVG(shapes, { fill: "black" }); // Black will mask out this area
+    // maskContent.push(newPath);
+    maskContent.push(renderPathDataToSVG(x.pathData, { fill: "black" }));
   });
 
   negative.traces.forEach((trace) => {
-    const shapes = trace.shapes;
-    const newPath = renderShapesToSVG(shapes, {
-      stroke: "black", // Black will mask out this area
-      strokeWidth: trace.thickness,
-    });
-    maskContent.push(newPath);
+    // const shapes = trace.shapes;
+    // const newPath = renderShapesToSVG(shapes, {
+    //   stroke: "black", // Black will mask out this area
+    //   strokeWidth: trace.thickness,
+    // });
+    // maskContent.push(newPath);
+
+    maskContent.push(
+      renderPathDataToSVG(x.pathData, {
+        stroke: "black",
+        strokeWidth: x.thickness,
+      }),
+    );
   });
 
   return svg`

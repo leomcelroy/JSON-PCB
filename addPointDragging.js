@@ -37,7 +37,7 @@ export function addPointDragging(el) {
   listener("mousedown", "[path-control-point]", (e) => {
     if (getTool() !== "SELECT") return;
 
-    const idx = e.target.pointIdx;
+    const idx = e.target.dataset.pointIdx;
     clickedPtIdx = idx;
 
     ogControlPoints = JSON.parse(
@@ -133,7 +133,7 @@ export function addPointDragging(el) {
   listener("mouseup", "[path-control-point]", (e) => {
     if (getTool() !== "SELECT") return;
 
-    const idx = e.target.pointIdx;
+    const idx = e.target.dataset.pointIdx;
 
     const currentPoint = getPoint(e);
 

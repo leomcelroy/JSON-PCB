@@ -9,7 +9,7 @@ export function addLayerReordering(el) {
 
     listener("mousedown", ".layer-grabber", (e) => {
         draggedLayerEl = e.target.parentNode;
-        makePhantom(e, draggedLayerEl, () => {
+        const phantom = makePhantom(e, draggedLayerEl, () => {
             const fromIndex = draggedLayerEl.data.index;
             const toIndex = dropEl.data.index;
 
@@ -18,8 +18,11 @@ export function addLayerReordering(el) {
             document.querySelectorAll(".drop-layer-target").forEach((el) => {
                 el.classList.remove("drop-layer-target");
             });
+            draggedLayerEl.classList.remove("hidden");
             draggedLayerEl = null;
         });
+        draggedLayerEl.classList.add("hidden");
+        phantom.classList.add("dragged-layer");
     });
 
     listener("mousemove", ".layer-item, .layer-item *", (e) => {

@@ -17,13 +17,19 @@ import {
 } from "./shapeTransformations.js";
 import { getShapesBoundingBox } from "./getShapesBoundingBox.js";
 import { getBoardBoundingBox } from "./getBoardBoundingBox.js";
+import { drawLayer } from "./drawLayer.js";
+import { processComponent } from "./processComponent.js";
 
 export const STATE = {
   colorMap: {
-    "F.Cu": "#0000ffff",
+    "F.Cu": "#f7a614ff",
     "B.Cu": "#ff0000ff",
+    outline: "#1f6f1eff",
+    "F.Mask": "#000000ff",
+    "B.Mask": "#000000ff",
+    "F.Paste": "#000000ff",
   },
-  layerOrder: [],
+  layerOrder: ["F.Cu", "B.Cu", "outline", "F.Mask", "B.Mask", "F.Paste"],
   layerNotVisible: new Set(),
   board: null,
   layers: null,
@@ -50,6 +56,8 @@ window.STATE = STATE;
 
 export function setBoard(newBoard) {
   /* PROCESS FOOTPRINTS */
+
+  // console.time("SET BOARD");
 
   newBoard.footprints.forEach((footprint) => {
     const allShapes = [];
@@ -87,123 +95,13 @@ export function setBoard(newBoard) {
 
   /* PROCESS COMPONENTS */
 
-  newBoard.components.forEach((comp) => {
-    const footprint = newBoard.footprints.find(
-      (fp) => fp.id === comp.footprint,
-    );
-
-    if (footprint === undefined) {
-      console.log("component missing footprint", comp);
-      return;
-    }
-
-    const translate = comp.translate ?? [0, 0];
-    const rotate = comp.rotate ?? 0;
-    const flip = comp.flip ?? false;
-
-    const pads = [];
-    const compBoundingBox = {
-      xMin: Infinity,
-      xMax: -Infinity,
-      yMin: Infinity,
-      yMax: -Infinity,
-    };
-
-    footprint.pads.forEach((pad) => {
-      const newPad = {};
-
-      const traces = [];
-      const shapesForBoundingBox = [];
-
-      pad?.traces?.forEach((trace) => {
-        const shapes = trace.shapes;
-        const newShapes = pipe(
-          shapes,
-          (x) => (flip ? flipShapes(x, "horizontal") : x),
-          (x) => translateShapes(x, translate),
-          (x) => rotateShapes(x, rotate, translate),
-        );
-
-        shapesForBoundingBox.push(...newShapes);
-
-        const newTrace = copy(trace);
-        newTrace.shapes = newShapes;
-
-        pad.layers.forEach((layer) => {
-          traces.push({
-            ...newTrace,
-            layer: flip ? swapFB(layer) : layer,
-          });
-        });
-      });
-
-      const regions = [];
-      pad?.regions?.forEach((region) => {
-        const shapes = region.shapes;
-        const newShapes = pipe(
-          shapes,
-          (x) => (flip ? flipShapes(x, "horizontal") : x),
-          (x) => translateShapes(x, translate),
-          (x) => rotateShapes(x, rotate, translate),
-        );
-
-        shapesForBoundingBox.push(...newShapes);
-
-        const newRegion = copy(region);
-        newRegion.shapes = newShapes;
-
-        pad.layers.forEach((layer) => {
-          regions.push({
-            ...newRegion,
-            layer: flip ? swapFB(layer) : layer,
-          });
-        });
-      });
-
-      newPad.traces = traces;
-      newPad.regions = regions;
-
-      const padBBox = getShapesBoundingBox(shapesForBoundingBox);
-
-      if (padBBox.xMin < compBoundingBox.xMin)
-        compBoundingBox.xMin = padBBox.xMin;
-      if (padBBox.xMax > compBoundingBox.xMax)
-        compBoundingBox.xMax = padBBox.xMax;
-      if (padBBox.yMin < compBoundingBox.yMin)
-        compBoundingBox.yMin = padBBox.yMin;
-      if (padBBox.yMax > compBoundingBox.yMax)
-        compBoundingBox.yMax = padBBox.yMax;
-
-      newPad.boundingBox = padBBox;
-
-      newPad.position = [
-        (padBBox.xMin + padBBox.xMax) / 2,
-        (padBBox.yMin + padBBox.yMax) / 2,
-      ];
-
-      newPad.id = pad.id;
-
-      newPad.drill = pad.drill;
-
-      pads.push(newPad);
-    });
-
-    comp.pads = pads;
-    comp.boundingBox = compBoundingBox;
-    // comp.boundingBox = pipe(
-    //   footprint.boundingBox,
-    //   (x) => (flip ? flipBoundingBox(x, "horizontal") : x),
-    //   (x) => translateBoundingBox(x, translate),
-    //   (x) => rotateBoundingBox(x, rotate, translate),
-    // );
-    // console.log(footprint.boundingBox, comp.boundingBox);
-    comp.translate = translate;
-  });
+  newBoard.components.forEach((comp) => processComponent(comp, newBoard));
 
   /* PROCESS REGIONS */
 
   newBoard?.regions?.forEach((region) => {
     const shapes = contourToShapes(region.contour).shapes;
+    region.pathData = shapesToPathData(shapes);
     region.shapes = shapes;
     region.polarity = region.polarity === undefined ? "+" : region.polarity;
   });
@@ -212,6 +110,7 @@ export function setBoard(newBoard) {
 
   newBoard?.traces?.forEach((trace) => {
     const shapes = contourToShapes(trace.track).shapes;
+    trace.pathData = shapesToPathData(shapes);
     trace.shapes = shapes;
     trace.polarity = trace.polarity === undefined ? "+" : trace.polarity;
   });
@@ -225,8 +124,6 @@ export function setBoard(newBoard) {
   STATE.layers = getLayers(newBoard);
   const oldLayers = STATE.layerOrder;
   const newLayers = Object.keys(STATE.layers);
-
-  // TODO: try to match current layer order
 
   const MINIMUM_LAYERS = ["F.Cu", "B.Cu", "outline"];
 
@@ -252,6 +149,8 @@ export function setBoard(newBoard) {
 
   STATE.board = newBoard;
 
+  // console.timeEnd("SET BOARD");
+
   render(STATE);
 }
 
@@ -261,9 +160,20 @@ export function patchState(fn = null) {
   render(STATE);
 }
 
+export const renderLoop = () => {
+  // renderToCanvas(STATE);
+  // requestAnimationFrame(renderLoop);
+  // setInterval(() => {
+  //   requestAnimationFrame(() => renderToCanvas(STATE));
+  // }, 1000 / 20);
+};
+
 function render(state) {
   window.requestAnimationFrame(() => {
     r(view(state), document.body);
+
+    // render canvas
+    renderToCanvas(state);
   });
 }
 
@@ -297,14 +207,6 @@ function pipe(initialValue, ...fns) {
   return fns.reduce((value, fn) => fn(value), initialValue);
 }
 
-function swapFB(inputString) {
-  const result = inputString
-    .replace(/F\./g, "TEMP")
-    .replace(/B\./g, "F.")
-    .replace(/TEMP/g, "B.");
-  return result;
-}
-
 function reorderList(list1, list2) {
   // Create a Map to store indices of elements in list2
   const orderMap = new Map(list2.map((item, index) => [item, index]));
@@ -323,6 +225,55 @@ function reorderList(list1, list2) {
   ];
 
   return result;
+}
+
+function removeExtraData(key, value) {
+  if (key === "shapes") return undefined;
+  if (key === "boundingBox") return undefined;
+  if (key === "pathData") return undefined;
+
+  return value;
+}
+
+function strBoard(board) {
+  return JSON.stringify(board, removeExtraData);
+}
+
+function renderToCanvas(state) {
+  const canvas = document.querySelector(".workarea-canvas");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const {
+    layers,
+    colorMap,
+    hoverablePaths,
+    layerOrder,
+    layerNotVisible,
+    panZoomFns,
+  } = state;
+
+  if (layers) {
+    // Sort layers based on the order in layerOrder string
+    Object.entries(layers)
+      .sort(([layerA], [layerB]) => {
+        const indexA = layerOrder.indexOf(layerA);
+        const indexB = layerOrder.indexOf(layerB);
+        return indexB - indexA;
+      })
+      .forEach(([layer, tracesRegions]) => {
+        if (layerNotVisible.has(layer)) return;
+        drawLayer({
+          tracesRegions,
+          color: colorMap[layer],
+          tempCanvas: document.querySelector(".workarea-canvas-temp"),
+          canvas,
+          scale: panZoomFns.scale(),
+          x: panZoomFns.x(),
+          y: panZoomFns.y(),
+        });
+      });
+  }
 }
 
 /* SET JSON */
