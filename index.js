@@ -32,11 +32,19 @@ function init(state) {
   addDropUpload(document.body, {
     onDrop: ({ name, text }) => {
       console.log(name, text);
-      const sParsed = kicadParse(text);
 
-      const oldBoard = state.board;
-      const newBoard = oldBoard.footprints.push(sParsed);
-      setBoard(state.board);
+      const extension = name.split(".").at(-1);
+      if (extension === "kicad_mod") {
+        const sParsed = kicadParse(text);
+
+        const oldBoard = state.board;
+        const newBoard = oldBoard.footprints.push(sParsed);
+        setBoard(state.board);
+      }
+
+      if (extension === "json") {
+        setBoard(JSON.parse(text));
+      }
     },
   });
 
