@@ -120,7 +120,7 @@ export function view(state) {
                     });
                 }
 
-                document.body.append(canvas);
+                // document.body.append(canvas);
                 canvas.style = `
                   position: absolute;
                   left: 0;
