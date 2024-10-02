@@ -7,10 +7,12 @@ import { renderComponents } from "./renderComponents.js";
 import { renderEditModal } from "./renderEditModal.js";
 import { addAndEditPath } from "./addAndEditPath.js";
 import { jsonPopUp } from "./jsonPopUp.js";
-import { setBoard } from "./state.js";
+import { setBoard, patchState } from "./state.js";
 import { formatCode } from "./formatCode.js";
 import { getBoardBoundingBox } from "./getBoardBoundingBox.js";
-import { drawLayer } from "./drawLayer.js";
+import { testPCB } from "./testPCB.js";
+import { downloadPNG } from "./downloadPNG.js";
+import { downloadText } from "./downloadText.js";
 
 export function view(state) {
   const { layers, colorMap, hoverablePaths, layerOrder, layerNotVisible } =
@@ -45,92 +47,48 @@ export function view(state) {
         <div class="menu-item dropdown">
           <div class="dropdown-toggle">Export</div>
           <div class="dropdown-items">
-            <div class="dropdown-item">JSON</div>
+            <div
+              class="dropdown-item"
+              @click=${() => {
+                const data = JSON.parse(JSON.stringify(state.board));
+
+                data.components.forEach((comp) => {
+                  delete comp.pads;
+                });
+
+                function removeExtraData(key, value) {
+                  if (key === "shapes") return undefined;
+                  if (key === "boundingBox") return undefined;
+                  if (key === "pathData") return undefined;
+
+                  return value;
+                }
+
+                const newText = formatCode(
+                  JSON.stringify(data, removeExtraData),
+                );
+
+                let name = prompt("Please name your board.");
+                if (!name) name = "anon";
+
+                downloadText(`${name}.pcb.json`, newText);
+              }}
+            >
+              JSON
+            </div>
             <div
               class="dropdown-item"
               @click=${(e) => {
                 // create canvas that is size of board with some margin
                 // render layers to that canvas
                 // done
-
-                const canvas = document.createElement("canvas");
-                canvas.width = 500;
-                canvas.height = 500;
-                const ctx = canvas.getContext("2d");
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                const {
-                  layers,
-                  colorMap,
-                  layerOrder,
-                  layerNotVisible,
-                  panZoomFns,
-                } = state;
-
-                const boundingBox = getBoardBoundingBox(state.board);
-                const limits = {
-                  x: [boundingBox.xMin, boundingBox.xMax],
-                  y: [boundingBox.yMin, boundingBox.yMax],
-                };
-                limits.y = limits.y.map((y) => -y).reverse();
-
-                const bb = canvas.getBoundingClientRect();
-                const xr = limits.x[1] - limits.x[0];
-                const yr = limits.y[1] - limits.y[0];
-                const xScalingFactor = bb.width / xr;
-                const yScalingFactor = bb.height / yr;
-
-                const scalingFactor =
-                  Math.min(xScalingFactor, yScalingFactor) * 0.9;
-
-                const scale = scalingFactor;
-
-                const center = {
-                  x:
-                    ((limits.x[0] + limits.x[1]) / 2) * scalingFactor -
-                    bb.width / 2,
-                  y:
-                    ((limits.y[0] + limits.y[1]) / 2) * scalingFactor -
-                    bb.height / 2,
-                };
-
-                const x = -center.x;
-                const y = -center.y;
-
-                if (layers) {
-                  Object.entries(layers)
-                    .sort(([layerA], [layerB]) => {
-                      const indexA = layerOrder.indexOf(layerA);
-                      const indexB = layerOrder.indexOf(layerB);
-                      return indexB - indexA;
-                    })
-                    .forEach(([layer, tracesRegions]) => {
-                      if (layerNotVisible.has(layer)) return;
-                      drawLayer({
-                        tracesRegions,
-                        color: colorMap[layer],
-                        tempCanvas: document.querySelector(
-                          ".workarea-canvas-temp",
-                        ),
-                        canvas,
-                        scale: scale,
-                        x: x,
-                        y: y,
-                      });
-                    });
-                }
-
-                // document.body.append(canvas);
-                canvas.style = `
-                  position: absolute;
-                  left: 0;
-                  top: 0;
-                `;
+                downloadPNG(state);
+                patchState();
               }}
             >
               PNG
             </div>
-            <div class="dropdown-item">Gerber</div>
+            <div class="hidden dropdown-item">Gerber</div>
           </div>
         </div>
 
@@ -164,14 +122,35 @@ export function view(state) {
         >
           Edit JSON
         </div>
-        <div class="menu-item">New File</div>
+        <div
+          class="menu-item"
+          @click=${(e) => {
+            state.editPath = {
+              editing: false,
+              data: null,
+              editMode: "SELECT",
+              selectedPoints: new Set(),
+            };
+            state.editModal = {
+              open: false,
+              type: "",
+              id: null,
+            };
 
-        <div class="menu-item dropdown">
+            setBoard(JSON.parse(JSON.stringify(testPCB)));
+            document.querySelector("[center-view-btn]").click();
+          }}
+        >
+          New File
+        </div>
+
+        <div class="hidden menu-item dropdown">
           <div class="dropdown-toggle">Examples</div>
           <div class="dropdown-items"></div>
         </div>
 
         <div
+          center-view-btn
           class="menu-item"
           @click=${(e) => {
             const board = state.board;
@@ -237,12 +216,25 @@ export function view(state) {
           />
 
           <g class="transform-group">
-            <circle
-              r=${5 / (state?.panZoomFns?.scale() ?? 1)}
-              x="0"
-              y="0"
-              fill="red"
-            />
+            <g
+              stroke="black"
+              stroke-width="${2 / (state?.panZoomFns?.scale() ?? 1)}"
+            >
+              <!-- Horizontal line -->
+              <line
+                x1="${-5 / (state?.panZoomFns?.scale() ?? 1)}"
+                y1="0"
+                x2="${5 / (state?.panZoomFns?.scale() ?? 1)}"
+                y2="0"
+              />
+              <!-- Vertical line -->
+              <line
+                x1="0"
+                y1="${-5 / (state?.panZoomFns?.scale() ?? 1)}"
+                x2="0"
+                y2="${5 / (state?.panZoomFns?.scale() ?? 1)}"
+              />
+            </g>
             ${layersView} ${renderBoardBBox(state)}
             ${renderHoverablePaths(state)} ${renderComponents(state)}
             ${renderTempLine(state)} ${renderEditablePath(state)}

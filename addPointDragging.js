@@ -37,7 +37,7 @@ export function addPointDragging(el) {
   listener("mousedown", "[path-control-point]", (e) => {
     if (getTool() !== "SELECT") return;
 
-    const idx = e.target.dataset.pointIdx;
+    const idx = Number(e.target.dataset.pointIdx);
     clickedPtIdx = idx;
 
     ogControlPoints = JSON.parse(
@@ -74,7 +74,7 @@ export function addPointDragging(el) {
       currentPoint = suggestVH(
         controlPoints.filter((x, i) => !selectedPoints().has(i)),
         currentPoint,
-        20 / STATE?.panZoomFns?.scale(),
+        10 / STATE?.panZoomFns?.scale(),
       );
 
     const dx = currentPoint[0] - mousedownPoint[0];
@@ -133,7 +133,7 @@ export function addPointDragging(el) {
   listener("mouseup", "[path-control-point]", (e) => {
     if (getTool() !== "SELECT") return;
 
-    const idx = e.target.dataset.pointIdx;
+    const idx = Number(e.target.dataset.pointIdx);
 
     const currentPoint = getPoint(e);
 

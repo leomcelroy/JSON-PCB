@@ -45,7 +45,7 @@ function init(state) {
   svg.panZoomFns = panZoomFns;
   state.panZoomFns = panZoomFns;
 
-  setBoard(testPCB);
+  setBoard(JSON.parse(JSON.stringify(testPCB)));
 
   const board = state.board;
   const boundingBox = board.boundingBox;
@@ -57,6 +57,11 @@ function init(state) {
 
   window.addEventListener("keydown", (e) => {
     state.heldKeys.add(e.key);
+
+    if (e.key === "Backspace") {
+      const deleteBtn = document.querySelector(".delete-button");
+      if (deleteBtn) deleteBtn.click();
+    }
   });
 
   window.addEventListener("keyup", (e) => {
@@ -68,7 +73,7 @@ function init(state) {
 
   listenSVG("mousedown", ".hoverable-path", (e) => {
     const type = e.target.dataset.type;
-    const index = e.target.dataset.index;
+    const index = Number(e.target.dataset.index);
     const traceOrRegion = state.board[type][index];
     const trackOrContour = traceOrRegion.track || traceOrRegion.contour;
     const trackOrContourData = contourToShapes(trackOrContour);
@@ -99,6 +104,11 @@ function init(state) {
     (e) => {
       const btn = e.target.closest("[footprint-delete-btn]");
       const id = btn.footprintId;
+
+      if (state.board.components.some((comp) => comp.footprint === id)) {
+        alert("Can't delete footprint which is in use.");
+        return;
+      }
 
       patchState((s) => {
         s.board.footprints = s.board.footprints.filter((x) => x.id !== id);

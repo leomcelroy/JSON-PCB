@@ -1,5 +1,5 @@
 :root {
-  --svg-bg: lightgrey;
+  --svg-bg: #c4bdbdff;
 }
 
 html,
@@ -273,7 +273,8 @@ body {
 }
 
 /* Wrapper for each layer item */
-.layer-item {
+.layer-item,
+.bg-item {
   display: flex;
   align-items: center;
   padding: 6px;

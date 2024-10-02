@@ -2,6 +2,9 @@
 
 ## TODO
 
+- remove negative paths from bounding box generation
+- prevent footprint deletion if component is used
+- hotkeys
 - use arcs when converting kicad modules
 - path manipulation
   - fillet editing
@@ -12,9 +15,8 @@
   - save
   - export
     - json
-    - png!!!!!!!!!
+    - png
     - gerber?
-  - new file!!!!!!!!
   - examples
   - [x] center view
   - [x] view json
@@ -42,6 +44,7 @@
 
 ## DONE
 
+ - new file
 - footprint import
 - footprint drop in
   - ? json
@@ -79,6 +82,18 @@
   - draw preview point
 - holes
 
+
+### Oct 2, 2024
+
+How to handle footprints listing multiple layers.
+
+Should I duplicate the traces/contours.
+
+Or allow traces/contours to be on multiple layers.
+
+The like how the former is more explicit, but the latter matches the convention more.
+
+I think the main drawback of having to only specify one layer is that it's more verbose.
 
 ### Sep 30, 2024
 
