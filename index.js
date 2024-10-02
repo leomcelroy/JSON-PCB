@@ -20,7 +20,7 @@ function init(state) {
   r(view(state), document.body);
 
   resizeCanvas();
-  // renderLoop();
+  renderLoop();
 
   const svg = document.querySelector(".workarea-svg");
 

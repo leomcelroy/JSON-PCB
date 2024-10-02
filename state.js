@@ -161,11 +161,8 @@ export function patchState(fn = null) {
 }
 
 export const renderLoop = () => {
-  // renderToCanvas(STATE);
-  // requestAnimationFrame(renderLoop);
-  // setInterval(() => {
-  //   requestAnimationFrame(() => renderToCanvas(STATE));
-  // }, 1000 / 20);
+  requestAnimationFrame(renderLoop);
+  renderToCanvas(STATE);
 };
 
 function render(state) {
@@ -173,7 +170,7 @@ function render(state) {
     r(view(state), document.body);
 
     // render canvas
-    renderToCanvas(state);
+    // renderToCanvas(state);
   });
 }
 

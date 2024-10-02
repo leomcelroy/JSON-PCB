@@ -21,7 +21,7 @@ export function drawLayer({
 
   const { positive, negative } = tracesRegions;
 
-  // tempCtx.globalCompositeOperation = "source-over";
+  tempCtx.globalCompositeOperation = "source-over";
   positive.regions.forEach((x) => {
     const shapes = x.shapes;
     renderShapesToCanvas(shapes, tempCanvas, { fill: color });
@@ -35,7 +35,7 @@ export function drawLayer({
     });
   });
 
-  // tempCtx.globalCompositeOperation = "destination-out";
+  tempCtx.globalCompositeOperation = "destination-out";
   negative.regions.forEach((x) => {
     const shapes = x.shapes;
     renderShapesToCanvas(shapes, tempCanvas, { fill: color });
@@ -51,6 +51,6 @@ export function drawLayer({
 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-  // ctx.globalCompositeOperation = "source-over";
+  ctx.globalCompositeOperation = "source-over";
   ctx.drawImage(tempCanvas, 0, 0);
 }
