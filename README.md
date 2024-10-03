@@ -57,7 +57,7 @@ path = [
             plated: false,
             // possible addition of track
           },
-          maskOffset: .03
+          maskOffset: .03 // 0 by default
         }
       ]
     }
@@ -65,10 +65,10 @@ path = [
   components: [
     {
       id: "R1206_50ohm_0", // unique and displayed as label
-      footprint: "footprintName",
-      translate: [0, 1],
-      rotate: 90,
-      flip: false
+      footprint: "footprintId",
+      translate: [0, 1], // [0, 0] by default
+      rotate: 90, // 0 by default
+      flip: false // false by default
     }
   ],
   traces: [ // used for wires
