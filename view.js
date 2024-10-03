@@ -165,6 +165,16 @@ export function view(state) {
         >
           Center View
         </div>
+        <div
+          style="height: 100%; flex: 1; text-align: right; display: flex; justify-content: flex-end;"
+        >
+          <a
+            class="menu-item"
+            target="_blank"
+            href="https://github.com/leomcelroy/JSON-PCB/blob/main/README.md"
+            >Help/GitHub</a
+          >
+        </div>
       </div>
       <div class="right-toolbar">
         ${renderFootprintMenu(state)}
