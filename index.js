@@ -76,6 +76,22 @@ function init(state) {
       document.querySelector("[add-trace-btn]").click();
       e.preventDefault();
     }
+
+    if (e.key === "Escape") {
+      state.editPath = {
+        editing: false,
+        data: null,
+        editMode: "SELECT",
+        selectedPoints: new Set(),
+      };
+      state.editModal = {
+        open: false,
+        type: "",
+        id: null,
+      };
+
+      patchState();
+    }
   });
 
   window.addEventListener("keyup", (e) => {

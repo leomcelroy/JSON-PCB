@@ -73,6 +73,18 @@ export function addPathCreation(el) {
     if (getTool() !== "DRAW") return;
     currentPoint = getPoint(e);
 
+    let controlPoints = null;
+    if (STATE?.editPath?.data?.trackOrContourData) {
+      controlPoints = STATE?.editPath?.data?.trackOrContourData.controlPoints;
+    }
+
+    if (!isMetaPressed() && controlPoints !== null)
+      currentPoint = suggestVH(
+        controlPoints,
+        currentPoint,
+        10 / STATE?.panZoomFns?.scale(),
+      );
+
     patchState((s) => {
       s.currentPoint = currentPoint;
       let lastPoint = null;
@@ -83,13 +95,6 @@ export function addPathCreation(el) {
       }
       s.lastPoint = lastPoint;
     });
-
-    // if (!isMetaPressed())
-    //   currentPoint = suggestVH(
-    //     controlPoints.filter((x, i) => !selectedPoints().has(i)),
-    //     currentPoint,
-    //     20,
-    //   );
   });
 
   window.addEventListener("keydown", (e) => {
