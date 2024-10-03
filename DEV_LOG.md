@@ -2,9 +2,7 @@
 
 ## TODO
 
-- documentation
 - remove negative paths from bounding box generation
-- hotkeys
 - path manipulation
   - fillet editing
   - deleting points
@@ -13,7 +11,6 @@
   - save
   - gerber export
   - examples
-  - link to github
 - log mouse position in the corner
 - overflow layer menu
 - json editor button color
@@ -34,6 +31,9 @@
 
 ## DONE
 
+- link to github
+- hotkeys
+- documentation
 - edit footprint id
 - export
   - json

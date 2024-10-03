@@ -1,6 +1,13 @@
 import { patchState, setBoard, STATE } from "./state.js";
 import { makePhantom } from "./makePhantom.js";
 
+function round(num, ops = {}) {
+  const decimalPlaces = ops.decimalPlaces ?? 2;
+
+  const factor = Math.pow(10, decimalPlaces);
+  return Math.round(num * factor) / factor;
+}
+
 export function addComponentAdding(el) {
   function getPoint(e) {
     let rect = el.getBoundingClientRect();
@@ -41,7 +48,7 @@ export function addComponentAdding(el) {
             const newComp = {
               id: possibleId(),
               footprint: target.footprintId,
-              translate: transformedPoint,
+              translate: transformedPoint.map(round),
             };
 
             s.board.components.push(newComp);
