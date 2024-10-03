@@ -95,13 +95,17 @@ path = [
 
 ## Documentation
 
-### Importing Components
+### Importing Footprints
 
-You can drop in Kicad Components (`kicad_mod`) to import them.
+You can drop in Kicad Footprints (`kicad_mod`) to import them.
 
 You can find the [Fab Inventory here](https://gitlab.fabcloud.org/pub/libraries/electronics/kicad/-/tree/master/fab.pretty?ref_type=heads).
 
 Simply download the directory and drop in the components you need.
+
+### Adding Components
+
+To create a componet drag the icon of a footprint into the workpane.
 
 ### Hot Keys
 
