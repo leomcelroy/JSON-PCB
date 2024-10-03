@@ -73,21 +73,26 @@ export function getShapesBoundingBox(shapes) {
 
 // Helper function to determine if an angle is within the arc's angular range
 function isAngleInArcRange(startAngle, endAngle, testAngle, anticlockwise) {
+    // Normalize all angles to the range [0, 2π]
+    const normalizeAngle = (angle) => (angle + 2 * Math.PI) % (2 * Math.PI);
+
+    startAngle = normalizeAngle(startAngle);
+    endAngle = normalizeAngle(endAngle);
+    testAngle = normalizeAngle(testAngle);
+
     if (anticlockwise) {
-        // Normalize angles to [0, 2π]
-        if (startAngle < 0) startAngle += 2 * Math.PI;
-        if (endAngle < 0) endAngle += 2 * Math.PI;
-        if (testAngle < 0) testAngle += 2 * Math.PI;
-
-        // Check if the arc spans the critical angle in the counterclockwise direction
-        return testAngle <= startAngle && testAngle >= endAngle;
+        // If going anticlockwise, check if testAngle is between startAngle and endAngle
+        if (startAngle < endAngle) {
+            return testAngle <= startAngle || testAngle >= endAngle;
+        } else {
+            return testAngle <= startAngle && testAngle >= endAngle;
+        }
     } else {
-        // Normalize angles to [0, 2π]
-        if (startAngle < 0) startAngle += 2 * Math.PI;
-        if (endAngle < 0) endAngle += 2 * Math.PI;
-        if (testAngle < 0) testAngle += 2 * Math.PI;
-
-        // Check if the arc spans the critical angle in the clockwise direction
-        return testAngle >= startAngle && testAngle <= endAngle;
+        // If going clockwise, check if testAngle is between startAngle and endAngle
+        if (startAngle < endAngle) {
+            return testAngle >= startAngle && testAngle <= endAngle;
+        } else {
+            return testAngle >= startAngle || testAngle <= endAngle;
+        }
     }
 }

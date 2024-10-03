@@ -47,12 +47,11 @@ export function processComponent(comp, board) {
       newTrace.track = copy(trace.track);
       newTrace.shapes = newShapes;
       newTrace.pathData = shapesToPathData(newShapes);
+      const layer = newTrace.layer;
 
-      pad.layers.forEach((layer) => {
-        traces.push({
-          ...newTrace,
-          layer: flip ? swapFB(layer) : layer,
-        });
+      traces.push({
+        ...newTrace,
+        layer: flip ? swapFB(layer) : layer,
       });
     });
 
@@ -72,12 +71,10 @@ export function processComponent(comp, board) {
       newRegion.contour = copy(region.contour);
       newRegion.shapes = newShapes;
       newRegion.pathData = shapesToPathData(newShapes);
-
-      pad.layers.forEach((layer) => {
-        regions.push({
-          ...newRegion,
-          layer: flip ? swapFB(layer) : layer,
-        });
+      const layer = newRegion.layer;
+      regions.push({
+        ...newRegion,
+        layer: flip ? swapFB(layer) : layer,
       });
     });
 

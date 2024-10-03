@@ -13,7 +13,7 @@ import { view } from "./view.js";
 import { render as r } from "lit-html";
 import { testPCB } from "./testPCB.js";
 import { contourToShapes } from "./contourToShapes.js";
-import { kicadParse } from "./kicadParse-0.js";
+import { kicadParse } from "./kicadParse-1.js";
 
 function init(state) {
   // render app immediately
@@ -125,6 +125,20 @@ function init(state) {
       });
     },
   );
+
+  listenBody("mousedown", "[footprint-id-btn]", (e) => {
+    const newId = prompt("Please provide a new footprint ID.");
+    if (!newId || newId === "") return;
+
+    // TODO: add validation
+
+    const currentId = e.target.dataset.id;
+
+    const footprint = state.board.footprints.find((x) => x.id === currentId);
+    footprint.id = newId;
+
+    setBoard(state.board);
+  });
 }
 
 const trigger = (e) => e.composedPath()[0];

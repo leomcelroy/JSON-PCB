@@ -1,176 +1,232 @@
 import { sParse } from "./sParse.js";
 
 export function kicadParse(data) {
-    // Parse the KiCad module input
-    const r = sParse(data);
-    const scale = 1 / 25.4; // Convert from mm to inches or required units
+    let r = sParse(data);
+
+    let scale = 1 / 25.4;
     const pads = [];
+    const seenPads = new Set();
 
-    // Process the parsed lines to extract pad information
     for (const line of r) {
-        if (line[0] !== "pad") continue; // Only process pad lines
+        const isPad = line[0] === "pad";
+        const isSmd = line[2] === "smd";
+        const isThru = line[2] === "thru_hole";
+        const shape = line[3];
 
-        const name = line[1]; // Pad name
-        const type = line[2]; // Pad type (SMD, thru_hole, etc.)
-        const shape = line[3]; // Pad shape (circle, rect, etc.)
-        const position = getNamedArray(line, "at").map(Number);
-        const size = getNamedArray(line, "size").map(Number);
-        const layers = getNamedArray(line, "layers");
-        const drillInfo = extractDrillInfo(line);
+        if (isPad && (isSmd || isThru)) {
+            let name = line[1];
 
-        const pad = {
-            id: name,
-            position: [position[0] * scale, -position[1] * scale], // Adjust position, flip Y-axis
-            regions: createRegions(shape, size, scale),
-            layers: convertLayers(layers),
-            drill: drillInfo,
-            maskOffset: getMaskOffset(line), // Add mask offset if available
-        };
+            let at = getNamedArray(line, "at").map((x) => Number(x) * scale);
+            at[1] = -at[1]; // negative Y axis
+            let rotate =
+                at.length === 3 ? Number(getNamedArray(line, "at")[2]) : 0;
 
-        pads.push(pad);
+            let layers = getNamedArray(line, "layers");
+            layers = convertLayers(layers);
+
+            let size = getNamedArray(line, "size").map(
+                (x) => Number(x) * scale,
+            );
+
+            const shapeCases = {
+                rect: () => rectangle(...size),
+                roundrect: () => {
+                    const ratio = Number(
+                        getNamedArray(line, "roundrect_rratio")[0],
+                    );
+                    const pts = generateRoundRect(0, 0, ...size, ratio);
+
+                    return path;
+                },
+                circle: () => circle(...size.map((x) => x / 2)),
+                oval: () => {
+                    const path = generateRoundRect(0, 0, ...size, 1);
+                    return path;
+                },
+                custom: () => {
+                    const primitives = getNamedArray(line, "primitives");
+
+                    const poly = primitives[0][1]
+                        .slice(1)
+                        .map((xy, i) => [
+                            i === 0 ? "start" : "lineTo",
+                            Number(xy[1]) * scale,
+                            Number(xy[2]) * scale,
+                        ]);
+
+                    return poly;
+                },
+                // "ellipse": () => circle(...size),
+            };
+
+            let shapeGeometry = shape in shapeCases ? shapeCases[shape]() : [];
+
+            if (rotate !== 0) {
+                shapeGeometry = rotatePath(shapeGeometry, rotate);
+            }
+
+            const regions = [];
+
+            layers.forEach((layer) => {
+                regions.push({
+                    contour: shapeGeometry,
+                    polarity: "+",
+                    layer,
+                });
+            });
+
+            const footprint = {
+                position: at,
+                regions,
+            };
+
+            const drillIndex = line.findIndex(
+                (entry) => Array.isArray(entry) && entry[0] === "drill",
+            );
+
+            if (drillIndex !== -1) {
+                let drillDia = Number(line[drillIndex][1]) * scale;
+                if (drillDia)
+                    footprint.drill = {
+                        diameter: drillDia,
+                        start: "F.Cu", // this should come from layers
+                        end: "B.Cu",
+                        plated: true, // hmm how does kicad module do this
+                    };
+            }
+
+            // if shared name in same location then merge
+            // if this is in the same position has a current pad add it to that one
+
+            let merged = false;
+            pads.forEach((pad) => {
+                const pos = pad.position;
+
+                if (pos[0] !== at[0] || pos[1] !== at[1]) return;
+
+                merged = true;
+
+                pad.regions = [...pad.regions, ...regions];
+                if (footprint.drill && pad.drill)
+                    pad.drill.diameter = Math.max(
+                        pad.drill.diameter,
+                        footprint.drill.diameter,
+                    );
+                if (footprint.drill) pad.drill = footprint.drill;
+            });
+
+            if (merged) continue;
+
+            let i = 0;
+            let getName = () => name + (i === 0 ? "" : i);
+            while (seenPads.has(getName())) {
+                i++;
+            }
+            pads.push({
+                id: getName(),
+                ...footprint,
+            });
+            seenPads.add(getName());
+        }
     }
 
-    // Return final structured object
-    return {
-        id: r[1], // Assuming second element is footprint/module ID
-        pads: pads,
-    };
-}
+    console.log({ pads });
 
-// Convert shapes to regions
-function createRegions(shape, size, scale) {
-    const [width, height] = size.map((s) => s * scale);
-
-    if (shape === "rect") {
-        return [
-            {
-                contour: createRectangle(width, height),
-                polarity: "+",
-            },
-        ];
-    } else if (shape === "circle") {
-        const radius = width / 2;
-        return [
-            {
-                contour: createCircle(radius),
-                polarity: "+",
-            },
-        ];
-    } else if (shape === "oval") {
-        return [
-            {
-                contour: createOval(width, height),
-                polarity: "+",
-            },
-        ];
-    } else if (shape === "roundrect") {
-        const rratio = getNamedArray(line, "roundrect_rratio")[0];
-        return [
-            {
-                contour: createRoundRect(width, height, rratio),
-                polarity: "+",
-            },
-        ];
-    }
-    // Custom shape handling can be added here
-    return [];
-}
-
-// Extract drill information for thru-hole pads
-function extractDrillInfo(line) {
-    const drillIndex = line.findIndex(
-        (entry) => Array.isArray(entry) && entry[0] === "drill",
+    const result = JSON.parse(
+        JSON.stringify({
+            id: r[1],
+            pads,
+        }),
     );
-    if (drillIndex === -1) return null;
 
-    const drillSize = Number(line[drillIndex][1]) * (1 / 25.4); // Convert to inches or required units
-    const plated = line[drillIndex][2] === "plated"; // Check if plated
-    return {
-        diameter: drillSize,
-        start: "F.Cu", // Default values for drill layer
-        end: "B.Cu",
-        plated: plated || false,
+    console.log("return result");
+
+    return result;
+}
+
+const rectangle = (w, h) => {
+    const p0 = [-w / 2, h / 2];
+    const p1 = [w / 2, h / 2];
+    const p2 = [w / 2, -h / 2];
+    const p3 = [-w / 2, -h / 2];
+
+    return [
+        ["start", ...p0],
+        ["lineTo", ...p1],
+        ["lineTo", ...p2],
+        ["lineTo", ...p3],
+        ["close"],
+    ];
+};
+
+const circle = (r) => {
+    return [
+        ["start", r, 0],
+        ["arcTo", -r, 0, { sweepAngle: 180 }],
+        ["arcTo", r, 0, { sweepAngle: 180 }],
+    ];
+};
+
+function rotatePath(path, theta) {
+    theta = (theta / 180) * Math.PI;
+    const rotatePoint = ([x, y], theta) => {
+        const cosTheta = Math.cos(theta);
+        const sinTheta = Math.sin(theta);
+        const newX = x * cosTheta - y * sinTheta;
+        const newY = x * sinTheta + y * cosTheta;
+        return [newX, newY];
     };
-}
 
-// Create a rectangular contour
-function createRectangle(width, height) {
-    return [
-        ["start", -width / 2, height / 2],
-        ["lineTo", width / 2, height / 2],
-        ["lineTo", width / 2, -height / 2],
-        ["lineTo", -width / 2, -height / 2],
-        ["close"],
-    ];
-}
-
-// Create a circular contour
-function createCircle(radius) {
-    return [
-        ["start", 0, radius],
-        ["arcTo", 0, -radius, { sweepAngle: 360 }],
-        ["close"],
-    ];
-}
-
-// Create an oval contour
-function createOval(width, height) {
-    return createRoundRect(width, height, 1); // Oval is a round rectangle with maximum corner radius
-}
-
-// Create a rounded rectangle contour
-function createRoundRect(width, height, rratio) {
-    const radius = (Math.min(width, height) * rratio) / 2;
-    return [
-        ["start", -width / 2 + radius, height / 2],
-        ["lineTo", width / 2 - radius, height / 2],
-        [
-            "arcTo",
-            width / 2,
-            height / 2 - radius,
-            { corner: ["fillet", radius] },
-        ],
-        ["lineTo", width / 2, -height / 2 + radius],
-        [
-            "arcTo",
-            width / 2 - radius,
-            -height / 2,
-            { corner: ["fillet", radius] },
-        ],
-        ["lineTo", -width / 2 + radius, -height / 2],
-        [
-            "arcTo",
-            -width / 2,
-            -height / 2 + radius,
-            { corner: ["fillet", radius] },
-        ],
-        ["lineTo", -width / 2, height / 2 - radius],
-        [
-            "arcTo",
-            -width / 2 + radius,
-            height / 2,
-            { corner: ["fillet", radius] },
-        ],
-        ["close"],
-    ];
-}
-
-// Convert KiCad layers into the required format
-function convertLayers(layers) {
-    return layers.map((layer) => {
-        if (layer === "*") return ["F.Cu", "B.Cu"]; // Handle wildcard layers
-        return layer;
+    return path.map((command) => {
+        if (command[0] === "close") return command;
+        const [type, x, y] = command;
+        const [newX, newY] = rotatePoint([x, y], theta);
+        return [type, newX, newY];
     });
 }
 
-// Utility to extract named arrays from KiCad format
-function getNamedArray(line, name) {
-    const entry = line.find((e) => Array.isArray(e) && e[0] === name);
-    return entry ? entry.slice(1) : [];
-}
+const convertLayers = (layers) =>
+    layers.reduce((acc, cur) => {
+        let l = cur.split(".");
+        if (l.length === 0) return acc;
+        else if (l[0] !== "*") return [...acc, cur];
+        else return [...acc, `F.${l[1]}`, `B.${l[1]}`];
+    }, []);
 
-// Extract mask offset from line
-function getMaskOffset(line) {
-    const maskMargin = getNamedArray(line, "solder_mask_margin");
-    return maskMargin.length ? Number(maskMargin[0]) * (1 / 25.4) : 0.03; // Default value
+const getNamedArray = (line, name) => {
+    const index = line.findIndex(
+        (entry) => Array.isArray(entry) && entry[0] === name,
+    );
+    const value = line[index];
+
+    return value ? value.slice(1) : [];
+};
+
+function generateRoundRect(centerX, centerY, width, height, rratio) {
+    const radius = (Math.min(width, height) * rratio) / 2;
+
+    const topLeft = [
+        centerX - width / 2 + radius,
+        centerY - height / 2 + radius,
+    ];
+    const topRight = [
+        centerX + width / 2 - radius,
+        centerY - height / 2 + radius,
+    ];
+    const bottomRight = [
+        centerX + width / 2 - radius,
+        centerY + height / 2 - radius,
+    ];
+    const bottomLeft = [
+        centerX - width / 2 + radius,
+        centerY + height / 2 - radius,
+    ];
+
+    return [
+        ["start", ...topLeft, { corner: ["fillet", radius] }],
+        ["lineTo", ...topRight, { corner: ["fillet", radius] }],
+        ["lineTo", ...bottomRight, { corner: ["fillet", radius] }],
+        ["lineTo", ...bottomLeft, { corner: ["fillet", radius] }],
+        ["close"],
+    ];
 }

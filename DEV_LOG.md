@@ -2,31 +2,22 @@
 
 ## TODO
 
+- documentation
 - remove negative paths from bounding box generation
-- prevent footprint deletion if component is used
 - hotkeys
-- use arcs when converting kicad modules
 - path manipulation
   - fillet editing
   - deleting points
   - adding points on path
-- edit footprint id!!!!!!!!
 - top menu
   - save
-  - export
-    - json
-    - png
-    - gerber?
+  - gerber export
   - examples
-  - [x] center view
-  - [x] view json
   - link to github
-- make it look nice
 - log mouse position in the corner
-- make sure board bounding box is updated when dragging elements
-  - update bounding box when centering
 - overflow layer menu
 - json editor button color
+- test round rect import
 
 - box select
 - a grid
@@ -36,7 +27,6 @@
 - remove empty traces/regions?
 - add component labels and pad labels to bottom of layer list
 
-
 ## BUGS
 
 - when I click a hoverable path another one flashes
@@ -44,7 +34,18 @@
 
 ## DONE
 
- - new file
+- edit footprint id
+- export
+  - json
+  - png
+- center view
+- view json
+- ? make sure board bounding box is updated when dragging elements
+- update bounding box when centering
+- make it look nice
+- use arcs when converting kicad modules
+- prevent footprint deletion if component is used
+- new file
 - footprint import
 - footprint drop in
   - ? json
@@ -94,6 +95,16 @@ Or allow traces/contours to be on multiple layers.
 The like how the former is more explicit, but the latter matches the convention more.
 
 I think the main drawback of having to only specify one layer is that it's more verbose.
+
+One thing to consider is that kicad_modules don't assign ids to pads.
+So many pads share a name (which is the net).
+In my case I really want to differentiate id's based on location.
+So I want to group things which may not be on the same pads.
+
+But I could still have multiple layers per a region, which is probably the right thing to do because
+geometry is often the same like (F.Mask, F.Cu)
+
+Will have to adjust the menu for this too
 
 ### Sep 30, 2024
 

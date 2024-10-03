@@ -177,14 +177,22 @@ body {
 .footprint-icon svg {
   width: 100%;
   height: 100%;
+  transform: scale(1, -1);
 }
 
 /* Margin between the icon and the footprint name */
 .footprint-name {
-  margin-left: 10px;
+  margin: 0px 10px;
   overflow: hidden;
   flex: 1;
   text-overflow: ellipsis;
+  padding: 2px;
+  border-radius: 5px;
+}
+
+.footprint-name:hover {
+  background: lightgrey;
+  cursor: pointer;
 }
 
 .delete-btn {

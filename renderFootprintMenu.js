@@ -36,7 +36,7 @@ export function renderFootprintMenu(state) {
           </svg>
         </div>
 
-        <div class="footprint-name">${id}</div>
+        <div footprint-id-btn data-id=${id} class="footprint-name">${id}</div>
 
         <div footprint-delete-btn class="delete-btn" .footprintId=${id}>
           <i class="fa-solid fa-xmark"></i>

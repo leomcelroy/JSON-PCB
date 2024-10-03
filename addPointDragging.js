@@ -1,6 +1,13 @@
 import { patchState, STATE, setBoard } from "./state.js";
 import { contourToShapes } from "./contourToShapes.js";
 
+function round(num, ops = {}) {
+  const decimalPlaces = ops.decimalPlaces ?? 2;
+
+  const factor = Math.pow(10, decimalPlaces);
+  return Math.round(num * factor) / factor;
+}
+
 export function addPointDragging(el) {
   function getPoint(e) {
     let rect = el.getBoundingClientRect();
@@ -76,6 +83,9 @@ export function addPointDragging(el) {
         currentPoint,
         10 / STATE?.panZoomFns?.scale(),
       );
+
+    // const dx = round(currentPoint[0] - mousedownPoint[0]);
+    // const dy = round(currentPoint[1] - mousedownPoint[1]);
 
     const dx = currentPoint[0] - mousedownPoint[0];
     const dy = currentPoint[1] - mousedownPoint[1];

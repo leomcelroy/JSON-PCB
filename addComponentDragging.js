@@ -2,6 +2,13 @@ import { patchState, setBoard } from "./state.js";
 import { processComponent } from "./processComponent.js";
 import { getLayers } from "./getLayers.js";
 
+function round(num, ops = {}) {
+  const decimalPlaces = ops.decimalPlaces ?? 2;
+
+  const factor = Math.pow(10, decimalPlaces);
+  return Math.round(num * factor) / factor;
+}
+
 export function addComponentDragging(el) {
   function getPoint(e) {
     let rect = el.getBoundingClientRect();
@@ -42,7 +49,7 @@ export function addComponentDragging(el) {
 
     patchState((s) => {
       const comp = s.board.components.find((x) => x.id === clickedId);
-      comp.translate = currentPoint;
+      comp.translate = currentPoint.map(round);
 
       // is there a way to do less here
       // i need to update the component

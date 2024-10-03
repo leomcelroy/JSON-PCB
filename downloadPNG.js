@@ -96,7 +96,7 @@ export function downloadPNG(state, name, dpi = 1000) {
   //   canvas.remove();
   // }, 2000);
 
-  dlCanvas(canvas, `${name}.png`);
+  dlCanvas(canvas, name);
 }
 
 function dlCanvas(canvas, name) {
