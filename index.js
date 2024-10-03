@@ -71,6 +71,11 @@ function init(state) {
       const deleteBtn = document.querySelector(".delete-button");
       if (deleteBtn) deleteBtn.click();
     }
+
+    if (e.metaKey && e.key === "a") {
+      document.querySelector("[add-trace-btn]").click();
+      e.preventDefault();
+    }
   });
 
   window.addEventListener("keyup", (e) => {

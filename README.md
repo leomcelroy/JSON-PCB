@@ -107,9 +107,13 @@ Simply download the directory and drop in the components you need.
 
 To create a componet drag the icon of a footprint into the workpane.
 
-### Hot Keys
+### Controls
+
+When in edit mode for a path double click to remove point selection.
 
 Press the meta key (`cmd` on Mac) in order to stop snapping when dragging points.
+
+Press the meta key (`cmd` on Mac) with `a` to add a new trace.
 
 ## Development
 

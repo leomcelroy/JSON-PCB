@@ -185,6 +185,7 @@ export function view(state) {
 
         <div class="menu-buttons-container">
           <div
+            add-trace-btn
             class="menu-button"
             @click=${() => {
               addAndEditPath("traces");
