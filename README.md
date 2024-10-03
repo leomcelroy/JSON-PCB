@@ -1,5 +1,7 @@
 # JSON PCB
 
+![Screenshot 2024-10-03 at 2 44 12 PM](https://github.com/user-attachments/assets/e8281deb-e20b-4d66-ac85-571a90c7eb95)
+
 JSON PCB was made to have a very easy way to create boards and an editor for the JSON circuit board description format.
 
 I've made a few EDA tools like [SVG-PCB](https://github.com/leomcelroy/svg-pcb) and [NetWeaver](https://github.com/leomcelroy/net-weaver).
