@@ -1,4 +1,5 @@
 export const testPCB = {
+  version: "0.0.1",
   footprints: [
     {
       id: "xiao_2040",
