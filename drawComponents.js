@@ -20,8 +20,8 @@ export function drawComponents({
   tempCanvas.height = canvas.height;
   tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-  const padFontSize = 80;
-  const compFontSize = 80;
+  const padFontSize = 14;
+  const compFontSize = 14;
 
   tempCtx.setTransform(scale, 0, 0, scale, x, y);
 
