@@ -83,6 +83,16 @@
   - draw preview point
 - holes
 
+### Nov 6, 2024
+
+Moved text rendering to canvas which greatly improved snapiness.
+
+Have weird issues with the text not scaling smoothly or positioning properly.
+
+Maybe there is a lower limit on text size.
+
+Also decided to make `layer` into `layers`
+
 
 ### Oct 2, 2024
 

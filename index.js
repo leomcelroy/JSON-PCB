@@ -183,6 +183,24 @@ function resizeCanvas() {
   const canvasBB = canvas.getBoundingClientRect();
   canvas.width = canvasBB.width;
   canvas.height = canvasBB.height;
+
+  // if (window.devicePixelRatio !== 1) {
+  //   const w = canvas.width;
+  //   const h = canvas.height;
+
+  //   // scale the canvas by window.devicePixelRatio
+  //   canvas.setAttribute("width", w * window.devicePixelRatio);
+  //   canvas.setAttribute("height", h * window.devicePixelRatio);
+
+  //   // use css to bring it back to regular size
+  //   // canvas.setAttribute("style", "width:" + w + "px; height:" + h + "px;");
+
+  //   // set the scale of the context
+  //   canvas
+  //     .getContext("2d")
+  //     .scale(window.devicePixelRatio, window.devicePixelRatio);
+  // }
+
   patchState();
 }
 
