@@ -49,7 +49,9 @@ export function drawLayer({
     });
   });
 
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  const dpr = window.devicePixelRatio ?? 1;
+
+  ctx.setTransform(1 * dpr, 0, 0, 1 * dpr, 0, 0);
 
   ctx.globalCompositeOperation = "source-over";
   ctx.drawImage(tempCanvas, 0, 0);
