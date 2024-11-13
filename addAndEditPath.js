@@ -6,7 +6,7 @@ export function addAndEditPath(type) {
   if (type === "traces") {
     newTraceOrRegion = {
       track: [],
-      layer: "F.Cu",
+      layers: ["F.Cu"],
       polarity: "+",
       thickness: 0.015,
     };
@@ -15,7 +15,7 @@ export function addAndEditPath(type) {
   if (type === "regions") {
     newTraceOrRegion = {
       contour: [],
-      layer: "F.Cu",
+      layers: ["F.Cu"],
       polarity: "+",
     };
   }

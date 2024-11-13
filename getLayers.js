@@ -17,7 +17,9 @@ export function getLayers(board) {
             region.polarity === "+" || region.polarity === undefined
                 ? "positive"
                 : "negative";
-        collectShapes(region, polarity, region.layer, "regions");
+        region.layers.forEach((layer) => {
+            collectShapes(region, polarity, layer, "regions");
+        });
     });
 
     board.traces.forEach((trace) => {
@@ -25,7 +27,9 @@ export function getLayers(board) {
             trace.polarity === "+" || trace.polarity === undefined
                 ? "positive"
                 : "negative";
-        collectShapes(trace, polarity, trace.layer, "traces");
+        trace.layers.forEach((layer) => {
+            collectShapes(trace, polarity, layer, "traces");
+        });
     });
 
     board.components.forEach((component) => {
@@ -35,7 +39,9 @@ export function getLayers(board) {
                     region.polarity === "+" || region.polarity === undefined
                         ? "positive"
                         : "negative";
-                collectShapes(region, polarity, region.layer, "regions");
+                region.layers.forEach((layer) => {
+                    collectShapes(region, polarity, layer, "regions");
+                });
             });
 
             pad.traces.forEach((trace) => {
@@ -43,7 +49,9 @@ export function getLayers(board) {
                     trace.polarity === "+" || trace.polarity === undefined
                         ? "positive"
                         : "negative";
-                collectShapes(trace, polarity, trace.layer, "traces");
+                trace.layers.forEach((layer) => {
+                    collectShapes(trace, polarity, layer, "traces");
+                });
             });
         });
     });
