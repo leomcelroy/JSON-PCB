@@ -38,6 +38,11 @@ function init(state) {
         const sParsed = kicadParse(text);
 
         const oldBoard = state.board;
+        const currentIds = new Set(oldBoard.footprints.map((x) => x.id));
+        if (currentIds.has(sParsed.id)) {
+          alert(`Footprint with ID (${sParsed.id}) exists.`);
+          return;
+        }
         const newBoard = oldBoard.footprints.push(sParsed);
         setBoard(state.board);
       }
