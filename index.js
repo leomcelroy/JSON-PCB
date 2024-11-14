@@ -58,6 +58,11 @@ function init(state) {
   const board = state.board;
   const boundingBox = board.boundingBox;
 
+  if (boundingBox.xMin === Infinity) boundingBox.xMin = 0;
+  if (boundingBox.xMax === -Infinity) boundingBox.xMax = 1;
+  if (boundingBox.yMin === Infinity) boundingBox.yMin = 0;
+  if (boundingBox.yMax === -Infinity) boundingBox.yMax = 1;
+
   svg.panZoomFns.setScaleXY({
     x: [boundingBox.xMin, boundingBox.xMax],
     y: [boundingBox.yMin, boundingBox.yMax],
@@ -181,8 +186,10 @@ window.addEventListener("DOMContentLoaded", (e) => {
 function resizeCanvas() {
   const canvas = document.querySelector(".workarea-canvas");
   const canvasBB = canvas.getBoundingClientRect();
-  canvas.width = canvasBB.width;
-  canvas.height = canvasBB.height;
+  const dpr = window.devicePixelRatio ?? 1;
+  canvas.width = canvasBB.width * dpr;
+  canvas.height = canvasBB.height * dpr;
+
   patchState();
 }
 

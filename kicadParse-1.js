@@ -67,12 +67,10 @@ export function kicadParse(data) {
 
             const regions = [];
 
-            layers.forEach((layer) => {
-                regions.push({
-                    contour: shapeGeometry,
-                    polarity: "+",
-                    layer,
-                });
+            regions.push({
+                contour: shapeGeometry,
+                polarity: "+",
+                layers,
             });
 
             const footprint = {
@@ -130,16 +128,12 @@ export function kicadParse(data) {
         }
     }
 
-    console.log({ pads });
-
     const result = JSON.parse(
         JSON.stringify({
             id: r[1],
             pads,
         }),
     );
-
-    console.log("return result");
 
     return result;
 }
