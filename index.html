@@ -15,7 +15,9 @@
   </head>
   <body></body>
   <script defer>
-    (function () {
+    const STATS = false;
+    
+    if (STATS) (function () {
       var script = document.createElement("script");
       script.onload = function () {
         var stats = new Stats();
