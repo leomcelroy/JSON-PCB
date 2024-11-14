@@ -86,15 +86,18 @@ export function renderEditModal(state) {
       <div class="form-group">
         <span>Layer</span>
         <select
-          .value=${region.layer}
+          .value=${region.layers[0]}
           @change=${(e) => {
-            region.layer = e.target.value;
+            region.layers[0] = e.target.value;
             setBoard(state.board);
           }}
         >
           ${layerOrder.map(
             (layer) =>
-              html`<option value=${layer} ?selected=${region.layer === layer}>
+              html`<option
+                value=${layer}
+                ?selected=${region.layers[0] === layer}
+              >
                 ${layer}
               </option>`,
           )}
@@ -134,15 +137,18 @@ export function renderEditModal(state) {
       <div class="form-group">
         <span>Layer</span>
         <select
-          .value=${trace.layer}
+          .value=${trace.layers[0]}
           @change=${(e) => {
-            trace.layer = e.target.value;
+            trace.layers[0] = e.target.value;
             setBoard(state.board);
           }}
         >
           ${layerOrder.map(
             (layer) =>
-              html`<option value=${layer} ?selected=${trace.layer === layer}>
+              html`<option
+                value=${layer}
+                ?selected=${trace.layers[0] === layer}
+              >
                 ${layer}
               </option>`,
           )}

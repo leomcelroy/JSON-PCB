@@ -4,6 +4,8 @@ export function renderComponents(state) {
   const components = state?.board?.components;
   if (!components) return "";
 
+  const scale = () => state?.panZoomFns?.scale() ?? 1;
+
   let result = [];
 
   components.forEach((component) => {
@@ -48,6 +50,7 @@ export function renderComponents(state) {
       if (drill) {
         result.push(svg`
           <circle 
+            class="hidden"
             cx="${position[0]}" 
             cy="${-position[1]}" 
             r=${drill ? drill.diameter / 2 : 0} 
@@ -60,12 +63,13 @@ export function renderComponents(state) {
           class="hidden"
           cx="${position[0]}" 
           cy="${-position[1]}" 
-          r="${5 / (state?.panZoomFns?.scale() ?? 1)}" 
+          r="${5 / scale()}" 
           fill="red"/>
         <text 
+          class="hidden"
           x="${position[0]}" 
           y="${-position[1]}" 
-          font-size="${14 / (state?.panZoomFns?.scale() ?? 1)}" 
+          font-size="${14 / scale()}" 
           fill="white"
           opacity=".95"
           stroke="black" 
@@ -83,16 +87,17 @@ export function renderComponents(state) {
         data-componentId=${id}
         cx="${translate[0]}" 
         cy="${-translate[1]}" 
-        r="${5 / (state?.panZoomFns?.scale() ?? 1)}" 
+        r="${5 / scale()}" 
         fill="white"
         stroke="black"
         vector-effect="non-scaling-stroke"
         stroke-width="2"
         />
       <text 
+        class="hidden"
         x="${translate[0]}" 
-        y="${-(translate[1] + 15 / (state?.panZoomFns?.scale() ?? 1))}" 
-        font-size="${12 / (state?.panZoomFns?.scale() ?? 1)}" 
+        y="${-(translate[1] + 15 / scale())}" 
+        font-size="${12 / scale()}" 
         fill="black"
         text-anchor="middle"
         style="pointer-events: none;"

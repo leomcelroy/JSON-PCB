@@ -18,6 +18,7 @@ import {
 import { getShapesBoundingBox } from "./getShapesBoundingBox.js";
 import { getBoardBoundingBox } from "./getBoardBoundingBox.js";
 import { drawLayer } from "./drawLayer.js";
+import { drawComponents } from "./drawComponents.js";
 import { processComponent } from "./processComponent.js";
 
 export const STATE = {
@@ -241,7 +242,8 @@ function renderToCanvas(state) {
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const { layers, colorMap, layerOrder, layerNotVisible, panZoomFns } = state;
+  const { layers, colorMap, layerOrder, layerNotVisible, panZoomFns, board } =
+    state;
 
   if (layers) {
     // Sort layers based on the order in layerOrder string
@@ -263,6 +265,17 @@ function renderToCanvas(state) {
           y: panZoomFns.y(),
         });
       });
+
+    drawComponents({
+      state,
+      components: board.components,
+      colorMap,
+      tempCanvas: document.querySelector(".workarea-canvas-temp"),
+      canvas,
+      scale: panZoomFns.scale(),
+      x: panZoomFns.x(),
+      y: panZoomFns.y(),
+    });
   }
 }
 
