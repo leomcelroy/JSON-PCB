@@ -215,23 +215,24 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 5px;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 /* Title for the menu header */
 .menu-title {
-  margin-top: 1rem;
   font-size: 1.15rem;
   font-weight: bold;
 }
 
 /* Import button styling */
-.import-btn {
-  background-color: #007bff; /* Blue background */
-  color: white;
-  border-radius: 4px;
-  outline: none;
-  border: none;
+.import-link {
   cursor: pointer;
+  color: black;
+}
+
+.import-link:hover {
+  color: #6a6a6a;
 }
 
 /* Hover effect for the import button */

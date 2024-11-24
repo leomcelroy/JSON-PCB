@@ -48,7 +48,12 @@ export function renderFootprintMenu(state) {
   return html`
     <div class="menu-header">
       <div class="menu-title">Footprints</div>
-      <button class="hidden import-btn">Import</button>
+      <a
+        class="import-link"
+        href="https://www.leomcelroy.com/brannock/"
+        target="_blank"
+        >Import</a
+      >
     </div>
     <div class="footprints-list">${results}</div>
   `;
