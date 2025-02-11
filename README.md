@@ -47,7 +47,7 @@ path = [
             {
               contour: path,
               polarity: "+" | "-",
-              layer: "F.Cu"
+              layers: ["F.Cu"]
             }
           ],
           drill: {
@@ -76,14 +76,14 @@ path = [
       track: path,
       thickness: 0.015,
       polarity: "+" | "-",
-      layer: "F.Cu"
+      layers: ["F.Cu"]
     }
   ],
   regions: [
     {
       contour: path,
       polarity: "+" | "-",
-      layer: "F.Cu"
+      layers: ["F.Cu"]
     },
   ],
   mmPerUnit: 25.4,
