@@ -12,7 +12,7 @@ import { initCodeEditor } from "./initCodeEditor.js";
 import { view } from "./view.js";
 import { render as r } from "lit-html";
 import { testPCB } from "./testPCB.js";
-import { contourToShapes } from "./contourToShapes.js";
+import { contourToShapes } from "./contourToShapes/contourToShapes.js";
 import { kicadParse } from "./kicadParse-1.js";
 
 function init(state) {
@@ -72,6 +72,18 @@ function init(state) {
     x: [boundingBox.xMin, boundingBox.xMax],
     y: [boundingBox.yMin, boundingBox.yMax],
   });
+
+  const savedBoard = window.sessionStorage.getItem("JSON-PCB-BOARD");
+  if (savedBoard) {
+    setBoard(JSON.parse(savedBoard));
+  }
+
+  setInterval(() => {
+    window.sessionStorage.setItem(
+      "JSON-PCB-BOARD",
+      JSON.stringify(state.board),
+    );
+  }, 5000);
 
   window.addEventListener("keydown", (e) => {
     state.heldKeys.add(e.key);

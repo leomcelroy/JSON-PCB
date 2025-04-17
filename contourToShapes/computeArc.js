@@ -1,4 +1,5 @@
 export function computeArc(currentPos, lastAngle, endPoint, sweepAngleDegrees) {
+  console.log("compute arc");
   if (sweepAngleDegrees === null) {
     const tanCir = findCircle(
       ...currentPos,
@@ -24,6 +25,8 @@ export function computeArc(currentPos, lastAngle, endPoint, sweepAngleDegrees) {
       lastAngle,
       endPoint,
     );
+
+    // console.log({ anticlockwise, currentPos, endPoint });
 
     const { centerX, centerY, radius } = tanCir;
     return {

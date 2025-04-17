@@ -1,6 +1,6 @@
 import { translateShapes } from "../shapeTransformations.js";
 import { kicadParse } from "../kicadParse-1.js";
-import { contourToShapes } from "../contourToShapes.js";
+import { contourToShapes } from "../contourToShapes/contourToShapes.js";
 import { shapesToPathData } from "../renderShapesToSVG.js";
 import { getShapesBoundingBox } from "../getShapesBoundingBox.js";
 

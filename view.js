@@ -13,6 +13,7 @@ import { getBoardBoundingBox } from "./getBoardBoundingBox.js";
 import { testPCB } from "./testPCB.js";
 import { downloadPNG } from "./downloadPNG.js";
 import { downloadText } from "./downloadText.js";
+import { downloadGerber } from "./gerber/downloadGerber.js";
 
 export function view(state) {
   const { layers, colorMap, hoverablePaths, layerOrder, layerNotVisible } =
@@ -49,76 +50,24 @@ export function view(state) {
           <div class="dropdown-items">
             <div
               class="dropdown-item"
-              @click=${() => {
-                const data = JSON.parse(JSON.stringify(state.board));
-
-                data.components.forEach((comp) => {
-                  delete comp.pads;
-                });
-
-                function removeExtraData(key, value) {
-                  if (key === "shapes") return undefined;
-                  if (key === "boundingBox") return undefined;
-                  if (key === "pathData") return undefined;
-
-                  return value;
-                }
-
-                const newText = formatCode(
-                  JSON.stringify(data, removeExtraData),
-                );
-
-                let name = prompt("Please name your board.");
-                if (!name) name = "anon";
-
-                downloadText(`${name}.pcb.json`, newText);
-              }}
+              @click=${(e) => clickDownloadJSON(state)}
             >
               JSON
             </div>
+            <div class="dropdown-item" @click=${(e) => clickDownloadPNG(state)}>
+              PNG
+            </div>
             <div
               class="dropdown-item"
-              @click=${(e) => {
-                let name = prompt("Please name your PNG.");
-                if (!name) name = "anon";
-                downloadPNG(state, name);
-                patchState();
-              }}
+              @click=${(e) => clickDownloadGerber(state)}
             >
-              PNG
+              Gerber
             </div>
             <div class="hidden dropdown-item">Gerber</div>
           </div>
         </div>
 
-        <div
-          class="menu-item"
-          @click=${(e) => {
-            const data = JSON.parse(JSON.stringify(state.board));
-
-            data.components.forEach((comp) => {
-              delete comp.pads;
-            });
-
-            function removeExtraData(key, value) {
-              if (key === "shapes") return undefined;
-              if (key === "boundingBox") return undefined;
-              if (key === "pathData") return undefined;
-
-              return value;
-            }
-
-            const newText = formatCode(JSON.stringify(data, removeExtraData));
-
-            jsonPopUp({
-              text: newText,
-              onSave: (newJSON) => {
-                const newBoard = JSON.parse(newJSON);
-                setBoard(newBoard);
-              },
-            });
-          }}
-        >
+        <div class="menu-item" @click=${(e) => clickEditJSON(state)}>
           Edit JSON
         </div>
         <div
@@ -137,7 +86,7 @@ export function view(state) {
             };
 
             setBoard(JSON.parse(JSON.stringify(testPCB)));
-            document.querySelector("[center-view-btn]").click();
+            // document.querySelector("[center-view-btn]").click();
           }}
         >
           New File
@@ -404,4 +353,64 @@ function renderEditablePath(state) {
     ${points}
 
   `;
+}
+
+function clickDownloadJSON(state) {
+  const data = JSON.parse(JSON.stringify(state.board));
+
+  data.components.forEach((comp) => {
+    delete comp.pads;
+  });
+
+  function removeExtraData(key, value) {
+    if (key === "shapes") return undefined;
+    if (key === "boundingBox") return undefined;
+    if (key === "pathData") return undefined;
+
+    return value;
+  }
+
+  const newText = formatCode(JSON.stringify(data, removeExtraData));
+
+  let name = prompt("Please name your board.");
+  if (!name) name = "anon";
+
+  downloadText(`${name}.pcb.json`, newText);
+}
+
+function clickDownloadPNG(state) {
+  let name = prompt("Please name your PNG.");
+  if (!name) name = "anon";
+  downloadPNG(state, name);
+  patchState();
+}
+
+function clickEditJSON(state) {
+  const data = JSON.parse(JSON.stringify(state.board));
+
+  data.components.forEach((comp) => {
+    delete comp.pads;
+  });
+
+  function removeExtraData(key, value) {
+    if (key === "shapes") return undefined;
+    if (key === "boundingBox") return undefined;
+    if (key === "pathData") return undefined;
+
+    return value;
+  }
+
+  const newText = formatCode(JSON.stringify(data, removeExtraData));
+
+  jsonPopUp({
+    text: newText,
+    onSave: (newJSON) => {
+      const newBoard = JSON.parse(newJSON);
+      setBoard(newBoard);
+    },
+  });
+}
+
+function clickDownloadGerber(state) {
+  downloadGerber(state);
 }

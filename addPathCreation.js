@@ -1,5 +1,5 @@
 import { patchState, STATE, setBoard } from "./state.js";
-import { contourToShapes } from "./contourToShapes.js";
+import { contourToShapes } from "./contourToShapes/contourToShapes.js";
 
 export function addPathCreation(el) {
   function getPoint(e) {

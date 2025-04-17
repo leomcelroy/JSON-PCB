@@ -1,7 +1,7 @@
 import { html, svg, render as r } from "lit-html";
 import { testPCB } from "./testPCB.js";
 import { getLayers } from "./getLayers.js";
-import { contourToShapes } from "./contourToShapes.js";
+import { contourToShapes } from "./contourToShapes/contourToShapes.js";
 import { shapesToPathData } from "./renderShapesToSVG.js";
 import { view } from "./view.js";
 import {

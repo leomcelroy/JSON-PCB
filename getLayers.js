@@ -1,4 +1,4 @@
-import { contourToShapes } from "./contourToShapes.js";
+import { contourToShapes } from "./contourToShapes/contourToShapes.js";
 
 export function getLayers(board) {
     const layers = {};

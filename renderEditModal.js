@@ -181,6 +181,7 @@ export function renderEditModal(state) {
         <input
           type="number"
           .value=${trace.thickness || 0}
+          step="0.001"
           @input=${(e) => {
             const value = Number(e.target.value) || 0;
             trace.thickness = value;

@@ -1,5 +1,28 @@
 # DEV LOG
 
+### Feb. 11, 2025
+
+- need to handle mask offsets in component imports and gerber file generation
+- noted that paths represent only one path with one start and close
+- make drill support routing
+- do cutouts have to be tracks?
+  - kind of makes sense because it's a router path
+  - maybe could just calculate toolpath
+  - outlines could be plated
+  - can specify geometry more easily as regions
+  - what tool diameter should I use?
+- maybe cutouts should be their own operation?
+
+- jlc pcb doesn't reach arcs
+- arc clockwise/anticlockwise direction is confused
+
+- Done
+  - separate positive and negative on layers
+  - traces can't have negative polarity?
+  - gerber arc has errors
+
+### Older
+
 ## TODO
 
 - remove negative paths from bounding box generation

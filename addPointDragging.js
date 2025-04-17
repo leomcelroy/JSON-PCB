@@ -1,5 +1,5 @@
 import { patchState, STATE, setBoard } from "./state.js";
-import { contourToShapes } from "./contourToShapes.js";
+import { contourToShapes } from "./contourToShapes/contourToShapes.js";
 
 function round(num, ops = {}) {
   const decimalPlaces = ops.decimalPlaces ?? 2;
