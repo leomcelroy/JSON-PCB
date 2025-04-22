@@ -61,6 +61,8 @@ export const toolkit = {
   xor: (polylines0, polylines1, ops = {}) =>
     boolean(normalizeInput(polylines0), normalizeInput(polylines1), "xor", ops),
   offset: (polylines, ...args) => offset(normalizeInput(polylines), ...args),
+  outline: (polylines) =>
+    offset(normalizeInput(polylines), 0, { endType: "closedPolygon" }),
   iteratePoints: (polylines, ...args) =>
     iteratePolylines(normalizeInput(polylines), ...args),
   transform: (polylines, ...args) =>
