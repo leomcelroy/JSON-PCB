@@ -1,13 +1,14 @@
 import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";
-// import { testPCB } from "./testPCB.js";
+import { indentWithTab } from "@codemirror/commands"; // Import indent command
+import { keymap } from "@codemirror/view";
+import { javascript } from "@codemirror/lang-javascript"; // Import javascript language support
 
 export function initCodeEditor(editorContainer) {
-  // Initialize the editor
   let editor = new EditorView({
     state: EditorState.create({
       doc: "",
-      extensions: [basicSetup],
+      extensions: [basicSetup, keymap.of([indentWithTab]), javascript()],
     }),
     parent: editorContainer,
   });

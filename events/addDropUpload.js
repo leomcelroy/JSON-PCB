@@ -17,35 +17,24 @@ export function addDropUpload(el, ops = {}) {
 
   const dropModal = document.createElement("div");
   dropModal.innerHTML = `
-    <style>
-      .drop-modal {
-        position: absolute;
-        left: 0px;
-        top: 0px;
-        border: 3px dashed black;
-        background: #8bf6dfd9;
-        width: 100%;
-        height: 100%;
-        box-sizing: border-box;
-        z-index: 9999999999;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .drop-info {
-        font-size: 1.4em;
-        text-align: center;
-      }
-
-      .hidden {
-        display: none;
-      }
-    </style>
-    <div class="drop-info">Upload JSON file, KiCAD Component Module, SVG Component, or JSON Component</div>
+    <div class="text-xl text-center">Upload JSON file, KiCAD Component Module, SVG Component, or JSON Component</div>
   `;
-  dropModal.classList.add("drop-modal");
-  dropModal.classList.add("hidden");
+  dropModal.classList.add(
+    "absolute",
+    "inset-0",
+    "border-2",
+    "border-dashed",
+    "border-black",
+    "bg-[#8bf6dfd9]/85",
+    "w-full",
+    "h-full",
+    "box-border",
+    "z-[9999]",
+    "flex",
+    "justify-center",
+    "items-center",
+    "hidden"
+  );
   document.body.appendChild(dropModal);
 
   const listen = createListener(el);

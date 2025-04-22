@@ -1,5 +1,5 @@
-import { patchState, setBoard, STATE } from "./state.js";
-import { makePhantom } from "./makePhantom.js";
+import { patchState, setBoard, STATE } from "../state.js";
+import { makePhantom } from "../makePhantom.js";
 
 function round(num, ops = {}) {
   const decimalPlaces = ops.decimalPlaces ?? 2;
@@ -67,7 +67,7 @@ export function addComponentAdding(el) {
 
       phantom.style.background = "none";
       phantom.style.border = "none";
-    },
+    }
   );
 }
 

@@ -1,5 +1,5 @@
 import { html } from "lit-html";
-import { patchState, setBoard } from "./state.js";
+import { patchState, setBoard } from "../state.js";
 
 export function renderEditModal(state) {
   if (!state.editModal.open) return "";
@@ -99,7 +99,7 @@ export function renderEditModal(state) {
                 ?selected=${region.layers[0] === layer}
               >
                 ${layer}
-              </option>`,
+              </option>`
           )}
         </select>
       </div>
@@ -120,7 +120,7 @@ export function renderEditModal(state) {
                 ?selected=${region.polarity === polarity}
               >
                 ${polarity}
-              </option>`,
+              </option>`
           )}
         </select>
       </div>
@@ -150,7 +150,7 @@ export function renderEditModal(state) {
                 ?selected=${trace.layers[0] === layer}
               >
                 ${layer}
-              </option>`,
+              </option>`
           )}
         </select>
       </div>
@@ -171,7 +171,7 @@ export function renderEditModal(state) {
                 ?selected=${trace.polarity === polarity}
               >
                 ${polarity}
-              </option>`,
+              </option>`
           )}
         </select>
       </div>

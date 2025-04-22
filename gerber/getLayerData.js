@@ -1,5 +1,5 @@
 import { isOutline } from "./isOutline.js";
-import { getLayers } from "../getLayers.js";
+import { getLayers } from "../boardHelpers/getLayers.js";
 
 export function getLayerData(board, flatten = false) {
   const layers = getLayers(board);

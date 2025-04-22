@@ -1,6 +1,6 @@
-import { patchState, setBoard } from "./state.js";
-import { processComponent } from "./processComponent.js";
-import { getLayers } from "./getLayers.js";
+import { patchState, setBoard } from "../state.js";
+import { processComponent } from "../processComponent.js";
+import { getLayers } from "../boardHelpers/getLayers.js";
 
 function round(num, ops = {}) {
   const decimalPlaces = ops.decimalPlaces ?? 2;

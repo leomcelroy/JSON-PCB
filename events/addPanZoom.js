@@ -1,4 +1,4 @@
-import { patchState } from "./state.js";
+import { patchState } from "../state.js";
 
 const trigger = (e) => e.composedPath()[0];
 const matchesTrigger = (e, selectorString) =>

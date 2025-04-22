@@ -1,5 +1,5 @@
-import { patchState } from "./state.js";
-import { contourToShapes } from "./contourToShapes/contourToShapes.js";
+import { patchState } from "../state.js";
+import { contourToShapes } from "../contourToShapes/contourToShapes.js";
 
 export function addAndEditPath(type) {
   let newTraceOrRegion = null;

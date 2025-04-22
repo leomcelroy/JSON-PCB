@@ -1,5 +1,5 @@
-import { patchState, STATE, setBoard } from "./state.js";
-import { contourToShapes } from "./contourToShapes/contourToShapes.js";
+import { patchState, STATE, setBoard } from "../state.js";
+import { contourToShapes } from "../contourToShapes/contourToShapes.js";
 
 export function addPathCreation(el) {
   function getPoint(e) {
@@ -82,7 +82,7 @@ export function addPathCreation(el) {
       currentPoint = suggestVH(
         controlPoints,
         currentPoint,
-        10 / STATE?.panZoomFns?.scale(),
+        10 / STATE?.panZoomFns?.scale()
       );
 
     patchState((s) => {

@@ -1,11 +1,12 @@
 import { STATE, setBoard, patchState, renderLoop } from "./state.js";
-import { addPanZoom } from "./addPanZoom.js";
-import { addPointDragging } from "./addPointDragging.js";
-import { addComponentDragging } from "./addComponentDragging.js";
-import { addComponentAdding } from "./addComponentAdding.js";
-import { addLayerReordering } from "./addLayerReordering.js";
-import { addPathCreation } from "./addPathCreation.js";
-import { addDropUpload } from "./addDropUpload.js";
+import { addPanZoom } from "./events/addPanZoom.js";
+import { addPointDragging } from "./events/addPointDragging.js";
+import { addComponentDragging } from "./events/addComponentDragging.js";
+import { addComponentAdding } from "./events/addComponentAdding.js";
+import { addLayerReordering } from "./events/addLayerReordering.js";
+import { addPathCreation } from "./events/addPathCreation.js";
+import { addDropUpload } from "./events/addDropUpload.js";
+import { addCodeCaching } from "./events/addCodeCaching.js";
 
 import { initCodeEditor } from "./initCodeEditor.js";
 
@@ -16,11 +17,16 @@ import { contourToShapes } from "./contourToShapes/contourToShapes.js";
 import { kicadParse } from "./kicadParse-1.js";
 
 function init(state) {
+  console.log("init");
   // render app immediately
   r(view(state), document.body);
 
   resizeCanvas();
   renderLoop();
+
+  const editor = document.querySelector(".code-editor");
+  initCodeEditor(editor);
+  addCodeCaching(editor);
 
   const svg = document.querySelector(".workarea-svg");
 
@@ -81,7 +87,7 @@ function init(state) {
   setInterval(() => {
     window.sessionStorage.setItem(
       "JSON-PCB-BOARD",
-      JSON.stringify(state.board),
+      JSON.stringify(state.board)
     );
   }, 5000);
 
@@ -166,7 +172,7 @@ function init(state) {
         s.board.footprints = s.board.footprints.filter((x) => x.id !== id);
         setBoard(s.board);
       });
-    },
+    }
   );
 
   listenBody("mousedown", "[footprint-id-btn]", (e) => {

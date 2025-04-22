@@ -29,7 +29,7 @@ path = [
   ["lineTo", x, y],
   ["arcTo", x, y],
   ["arcTo", x, y, { sweepAngle: angle }],
-  ["lineTo", x, y, { corner: [ "fillet", radius ]}],
+  ["lineTo", x, y, { corner: [ "fillet", radius ] }],
   ...,
   ["close"],
 ]
@@ -126,4 +126,3 @@ To run first clone the repo then in the directory run
 npm install
 npm run dev
 ```
-

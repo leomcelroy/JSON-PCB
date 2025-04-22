@@ -1,5 +1,5 @@
-import { patchState, STATE, setBoard } from "./state.js";
-import { contourToShapes } from "./contourToShapes/contourToShapes.js";
+import { patchState, STATE, setBoard } from "../state.js";
+import { contourToShapes } from "../contourToShapes/contourToShapes.js";
 
 function round(num, ops = {}) {
   const decimalPlaces = ops.decimalPlaces ?? 2;
@@ -48,7 +48,7 @@ export function addPointDragging(el) {
     clickedPtIdx = idx;
 
     ogControlPoints = JSON.parse(
-      JSON.stringify(STATE.editPath.data.trackOrContourData.controlPoints),
+      JSON.stringify(STATE.editPath.data.trackOrContourData.controlPoints)
     );
 
     patchState((state) => {
@@ -81,7 +81,7 @@ export function addPointDragging(el) {
       currentPoint = suggestVH(
         controlPoints.filter((x, i) => !selectedPoints().has(i)),
         currentPoint,
-        10 / STATE?.panZoomFns?.scale(),
+        10 / STATE?.panZoomFns?.scale()
       );
 
     // const dx = round(currentPoint[0] - mousedownPoint[0]);

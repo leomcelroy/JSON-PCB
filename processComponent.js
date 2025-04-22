@@ -3,8 +3,8 @@ import {
   rotateShapes,
   flipShapes,
 } from "./shapeTransformations.js";
-import { getShapesBoundingBox } from "./getShapesBoundingBox.js";
-import { shapesToPathData } from "./renderShapesToSVG.js";
+import { getShapesBoundingBox } from "./boardHelpers/getShapesBoundingBox.js";
+import { shapesToPathData } from "./views/renderShapesToSVG.js";
 
 export function processComponent(comp, board) {
   const footprint = board.footprints.find((fp) => fp.id === comp.footprint);
@@ -38,7 +38,7 @@ export function processComponent(comp, board) {
         shapes,
         (x) => (flip ? flipShapes(x, "horizontal") : x),
         (x) => translateShapes(x, translate),
-        (x) => rotateShapes(x, rotate, translate),
+        (x) => rotateShapes(x, rotate, translate)
       );
 
       shapesForBoundingBox.push(...newShapes);
@@ -62,7 +62,7 @@ export function processComponent(comp, board) {
         shapes,
         (x) => (flip ? flipShapes(x, "horizontal") : x),
         (x) => translateShapes(x, translate),
-        (x) => rotateShapes(x, rotate, translate),
+        (x) => rotateShapes(x, rotate, translate)
       );
 
       shapesForBoundingBox.push(...newShapes);

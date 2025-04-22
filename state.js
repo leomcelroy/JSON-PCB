@@ -1,8 +1,8 @@
 import { html, svg, render as r } from "lit-html";
 import { testPCB } from "./testPCB.js";
-import { getLayers } from "./getLayers.js";
+import { getLayers } from "./boardHelpers/getLayers.js";
 import { contourToShapes } from "./contourToShapes/contourToShapes.js";
-import { shapesToPathData } from "./renderShapesToSVG.js";
+import { shapesToPathData } from "./views/renderShapesToSVG.js";
 import { view } from "./view.js";
 import {
   translateShapes,
@@ -15,10 +15,10 @@ import {
   rotateBoundingBox,
   flipBoundingBox,
 } from "./shapeTransformations.js";
-import { getShapesBoundingBox } from "./getShapesBoundingBox.js";
-import { getBoardBoundingBox } from "./getBoardBoundingBox.js";
-import { drawLayer } from "./drawLayer.js";
-import { drawComponents } from "./drawComponents.js";
+import { getShapesBoundingBox } from "./boardHelpers/getShapesBoundingBox.js";
+import { getBoardBoundingBox } from "./boardHelpers/getBoardBoundingBox.js";
+import { drawLayer } from "./views/drawLayer.js";
+import { drawComponents } from "./views/drawComponents.js";
 import { processComponent } from "./processComponent.js";
 
 export const STATE = {
@@ -50,7 +50,6 @@ export const STATE = {
   heldKeys: new Set(),
   currentPoint: [0, 0],
   lastPoint: null,
-  PROGRAM_SCALE: 1,
 };
 
 window.STATE = STATE;

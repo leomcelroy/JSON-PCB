@@ -1,23 +1,23 @@
 import { html, svg } from "lit-html";
-import { renderShapesToSVG, shapesToPathData } from "./renderShapesToSVG.js";
-import { renderLayer } from "./renderLayer.js";
-import { renderLayerMenu } from "./renderLayerMenu.js";
-import { renderFootprintMenu } from "./renderFootprintMenu.js";
-import { renderComponents } from "./renderComponents.js";
-import { renderEditModal } from "./renderEditModal.js";
-import { addAndEditPath } from "./addAndEditPath.js";
-import { jsonPopUp } from "./jsonPopUp.js";
-import { setBoard, patchState } from "./state.js";
+import {
+  renderShapesToSVG,
+  shapesToPathData,
+} from "./views/renderShapesToSVG.js";
+// import { renderLayer } from "./renderLayer.js";
+import { renderLayerMenu } from "./views/renderLayerMenu.js";
+import { renderFootprintMenu } from "./views/renderFootprintMenu.js";
+import { renderComponents } from "./views/renderComponents.js";
+import { renderEditModal } from "./views/renderEditModal.js";
+import { addAndEditPath } from "./events/addAndEditPath.js";
+
+import { drawTopBar } from "./views/drawTopBar.js";
+
+import { runCode } from "./runCode/runCode.js";
 import { formatCode } from "./formatCode.js";
-import { getBoardBoundingBox } from "./getBoardBoundingBox.js";
-import { testPCB } from "./testPCB.js";
-import { downloadPNG } from "./downloadPNG.js";
-import { downloadText } from "./downloadText.js";
-import { downloadGerber } from "./gerber/downloadGerber.js";
 
 export function view(state) {
-  const { layers, colorMap, hoverablePaths, layerOrder, layerNotVisible } =
-    state;
+  // const { layers, colorMap, hoverablePaths, layerOrder, layerNotVisible } =
+  //   state;
 
   const layersView = [];
 
@@ -41,90 +41,35 @@ export function view(state) {
     <div class="root">
       <div class="left-toolbar">
         <div class="code-editor"></div>
-      </div>
-      <div class="top-menu">
-        <div class="menu-item hidden">Save</div>
-
-        <div class="menu-item dropdown">
-          <div class="dropdown-toggle">Export</div>
-          <div class="dropdown-items">
-            <div
-              class="dropdown-item"
-              @click=${(e) => clickDownloadJSON(state)}
-            >
-              JSON
-            </div>
-            <div class="dropdown-item" @click=${(e) => clickDownloadPNG(state)}>
-              PNG
-            </div>
-            <div
-              class="dropdown-item"
-              @click=${(e) => clickDownloadGerber(state)}
-            >
-              Gerber
-            </div>
-            <div class="hidden dropdown-item">Gerber</div>
-          </div>
-        </div>
-
-        <div class="menu-item" @click=${(e) => clickEditJSON(state)}>
-          Edit JSON
-        </div>
         <div
-          class="menu-item"
           @click=${(e) => {
-            state.editPath = {
-              editing: false,
-              data: null,
-              editMode: "SELECT",
-              selectedPoints: new Set(),
-            };
-            state.editModal = {
-              open: false,
-              type: "",
-              id: null,
-            };
-
-            setBoard(JSON.parse(JSON.stringify(testPCB)));
-            // document.querySelector("[center-view-btn]").click();
-          }}
-        >
-          New File
-        </div>
-
-        <div class="hidden menu-item dropdown">
-          <div class="dropdown-toggle">Examples</div>
-          <div class="dropdown-items"></div>
-        </div>
-
-        <div
-          center-view-btn
-          class="menu-item"
-          @click=${(e) => {
-            const board = state.board;
-            board.boundingBox = getBoardBoundingBox(board);
-            const svg = document.querySelector(".workarea-svg");
-            const boundingBox = board.boundingBox;
-
-            svg.panZoomFns.setScaleXY({
-              x: [boundingBox.xMin, boundingBox.xMax],
-              y: [boundingBox.yMin, boundingBox.yMax],
+            const editorContainer = document.querySelector(".code-editor");
+            const code = editorContainer.cm.state.doc.toString();
+            const formattedCoded = formatCode(code);
+            editorContainer.cm.dispatch({
+              changes: {
+                from: 0,
+                to: editorContainer.cm.state.doc.length,
+                insert: formattedCoded,
+              },
             });
           }}
+          class="absolute top-0 right-14 px-2 py-1 m-2 bg-blue-600 text-white rounded cursor-pointer hover:bg-blue-500"
         >
-          Center View
+          Format
         </div>
         <div
-          style="height: 100%; flex: 1; text-align: right; display: flex; justify-content: flex-end;"
+          @click=${(e) => {
+            const editorContainer = document.querySelector(".code-editor");
+            const code = editorContainer.cm.state.doc.toString();
+            runCode(code, state);
+          }}
+          class="absolute top-0 right-0 px-2 py-1 m-2 bg-green-600 text-white rounded cursor-pointer hover:bg-green-500"
         >
-          <a
-            class="menu-item"
-            target="_blank"
-            href="https://github.com/leomcelroy/JSON-PCB/blob/main/README.md"
-            >Help/GitHub</a
-          >
+          Run
         </div>
       </div>
+      ${drawTopBar(state)}
       <div class="right-toolbar">
         ${renderFootprintMenu(state)}
         <div class="hidden">Edit Netlist</div>
@@ -289,7 +234,7 @@ function renderHoverablePaths(state) {
           data-type=${x.type}
           data-index=${x.index}
           transform="scale(1 -1)"
-          />`,
+          />`
     );
   };
 
@@ -326,7 +271,7 @@ function renderEditablePath(state) {
         stroke="black"
         vector-effect="non-scaling-stroke"
         stroke-width="2"
-      />`,
+      />`
   );
 
   return svg`
@@ -353,64 +298,4 @@ function renderEditablePath(state) {
     ${points}
 
   `;
-}
-
-function clickDownloadJSON(state) {
-  const data = JSON.parse(JSON.stringify(state.board));
-
-  data.components.forEach((comp) => {
-    delete comp.pads;
-  });
-
-  function removeExtraData(key, value) {
-    if (key === "shapes") return undefined;
-    if (key === "boundingBox") return undefined;
-    if (key === "pathData") return undefined;
-
-    return value;
-  }
-
-  const newText = formatCode(JSON.stringify(data, removeExtraData));
-
-  let name = prompt("Please name your board.");
-  if (!name) name = "anon";
-
-  downloadText(`${name}.pcb.json`, newText);
-}
-
-function clickDownloadPNG(state) {
-  let name = prompt("Please name your PNG.");
-  if (!name) name = "anon";
-  downloadPNG(state, name);
-  patchState();
-}
-
-function clickEditJSON(state) {
-  const data = JSON.parse(JSON.stringify(state.board));
-
-  data.components.forEach((comp) => {
-    delete comp.pads;
-  });
-
-  function removeExtraData(key, value) {
-    if (key === "shapes") return undefined;
-    if (key === "boundingBox") return undefined;
-    if (key === "pathData") return undefined;
-
-    return value;
-  }
-
-  const newText = formatCode(JSON.stringify(data, removeExtraData));
-
-  jsonPopUp({
-    text: newText,
-    onSave: (newJSON) => {
-      const newBoard = JSON.parse(newJSON);
-      setBoard(newBoard);
-    },
-  });
-}
-
-function clickDownloadGerber(state) {
-  downloadGerber(state);
 }

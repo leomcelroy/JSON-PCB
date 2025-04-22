@@ -1,6 +1,6 @@
 import { changeDpiDataUrl } from "./changeDPI.js";
-import { getBoardBoundingBox } from "./getBoardBoundingBox.js";
-import { drawLayer } from "./drawLayer.js";
+import { getBoardBoundingBox } from "../boardHelpers/getBoardBoundingBox.js";
+import { drawLayer } from "../views/drawLayer.js";
 
 export function downloadPNG(state, name, dpi = 1000) {
   const { layers, colorMap, layerOrder, layerNotVisible, panZoomFns } = state;
@@ -45,7 +45,7 @@ export function downloadPNG(state, name, dpi = 1000) {
 
   if (layers) {
     const bgColor = getComputedStyle(document.body).getPropertyValue(
-      "--svg-bg",
+      "--svg-bg"
     );
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);

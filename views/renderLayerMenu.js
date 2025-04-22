@@ -1,5 +1,5 @@
 import { html } from "lit-html";
-import { patchState } from "./state.js";
+import { patchState } from "../state.js";
 
 export function renderLayerMenu(state) {
   const { colorMap, layerOrder, layerNotVisible } = state;
@@ -17,7 +17,7 @@ export function renderLayerMenu(state) {
 
     const onVisibilityChange = (e) => {
       const shiftHeld = [...state.heldKeys].some((key) =>
-        key.includes("Shift"),
+        key.includes("Shift")
       );
 
       patchState((s) => {
