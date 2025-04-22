@@ -1,4 +1,5 @@
 import { toolkit as tk } from "../polylineToolkit/toolkit";
+import { path } from "../path.js";
 
 async function executeDynamicModule(code, board) {
   const print = (...args) => {
@@ -21,6 +22,7 @@ async function executeDynamicModule(code, board) {
       "board",
       "tk",
       "print",
+      "path",
       `
       return (async () => {
         ${code}
@@ -28,7 +30,7 @@ async function executeDynamicModule(code, board) {
     `
     );
 
-    const result = await userFunction(board, tk, print);
+    const result = await userFunction(board, tk, print, path);
     return result;
   } catch (error) {
     console.error("Worker: Error executing user code:", error);

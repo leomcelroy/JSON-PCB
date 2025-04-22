@@ -21,7 +21,7 @@ export function addCodeCaching(
     console.error("Failed to load or set code from sessionStorage:", e);
   }
 
-  const intervalId = setInterval(() => {
+  setInterval(() => {
     const currentEditorView = editorDomElement?.cm;
 
     try {
@@ -34,6 +34,4 @@ export function addCodeCaching(
       );
     }
   }, 5000);
-
-  return intervalId;
 }

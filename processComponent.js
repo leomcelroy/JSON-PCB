@@ -127,4 +127,6 @@ function pipe(initialValue, ...fns) {
 
 function copy(json) {
   return JSON.parse(JSON.stringify(json));
+  return json;
+  // return structuredClone(json);
 }

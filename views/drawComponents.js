@@ -37,6 +37,8 @@ export function drawComponents({
         tempCtx.fill();
         tempCtx.closePath();
       }
+
+      if (!state.show.padLabels) return;
       tempCtx.font = `${padFontSize}px Arial`; // No DPR multiplier needed
       tempCtx.fillStyle = "white";
       tempCtx.strokeStyle = "black";
@@ -52,6 +54,7 @@ export function drawComponents({
       tempCtx.restore();
     });
 
+    if (!state.show.componentLabels) return;
     tempCtx.font = `${compFontSize}px Arial`; // No DPR multiplier needed
     tempCtx.fillStyle = "black";
     tempCtx.globalAlpha = 1.0;

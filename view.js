@@ -118,35 +118,38 @@ export function view(state) {
             height="20000"
             fill="var(--svg-bg)"
           />
-
-          <g class="transform-group">
-            <g
-              stroke="black"
-              stroke-width="${2 / (state?.panZoomFns?.scale() ?? 1)}"
-            >
-              <!-- Horizontal line -->
-              <line
-                x1="${-5 / (state?.panZoomFns?.scale() ?? 1)}"
-                y1="0"
-                x2="${5 / (state?.panZoomFns?.scale() ?? 1)}"
-                y2="0"
-              />
-              <!-- Vertical line -->
-              <line
-                x1="0"
-                y1="${-5 / (state?.panZoomFns?.scale() ?? 1)}"
-                x2="0"
-                y2="${5 / (state?.panZoomFns?.scale() ?? 1)}"
-              />
-            </g>
-            ${layersView} ${renderBoardBBox(state)}
-            ${renderHoverablePaths(state)} ${renderComponents(state)}
-            ${renderTempLine(state)} ${renderEditablePath(state)}
-          </g>
+          ${drawTransformGroup(state)};
         </svg>
         ${renderEditModal(state)}
       </div>
     </div>
+  `;
+}
+
+function drawTransformGroup(state) {
+  return "";
+  return svg`
+    <g class="transform-group">
+      <g stroke="black" stroke-width="${2 / (state?.panZoomFns?.scale() ?? 1)}">
+        <!-- Horizontal line -->
+        <line
+          x1="${-5 / (state?.panZoomFns?.scale() ?? 1)}"
+          y1="0"
+          x2="${5 / (state?.panZoomFns?.scale() ?? 1)}"
+          y2="0"
+        />
+        <!-- Vertical line -->
+        <line
+          x1="0"
+          y1="${-5 / (state?.panZoomFns?.scale() ?? 1)}"
+          x2="0"
+          y2="${5 / (state?.panZoomFns?.scale() ?? 1)}"
+        />
+      </g>
+      ${renderBoardBBox(state)} ${renderHoverablePaths(state)}
+      ${renderComponents(state)} ${renderTempLine(state)}
+      ${renderEditablePath(state)}
+    </g>
   `;
 }
 

@@ -81,7 +81,8 @@ export function renderComponents(state) {
       `);
     });
 
-    result.push(svg`
+    if (state.show.handles)
+      result.push(svg`
       <circle 
         component-control-pt
         data-componentId=${id}

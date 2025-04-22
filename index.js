@@ -84,12 +84,12 @@ function init(state) {
     setBoard(JSON.parse(savedBoard));
   }
 
-  setInterval(() => {
-    window.sessionStorage.setItem(
-      "JSON-PCB-BOARD",
-      JSON.stringify(state.board)
-    );
-  }, 5000);
+  // setInterval(() => {
+  //   window.sessionStorage.setItem(
+  //     "JSON-PCB-BOARD",
+  //     JSON.stringify(state.board)
+  //   );
+  // }, 5000);
 
   window.addEventListener("keydown", (e) => {
     state.heldKeys.add(e.key);

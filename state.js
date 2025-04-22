@@ -50,6 +50,11 @@ export const STATE = {
   heldKeys: new Set(),
   currentPoint: [0, 0],
   lastPoint: null,
+  show: {
+    handles: false,
+    componentLabels: false,
+    padLabels: false,
+  },
 };
 
 window.STATE = STATE;
