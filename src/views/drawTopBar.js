@@ -6,10 +6,11 @@ import { setBoard, patchState } from "../state.js";
 import { formatCode } from "../formatCode.js";
 import { downloadPNG } from "../download/downloadPNG.js";
 import { downloadText } from "../download/downloadText.js";
-import { downloadGerber } from "../gerber/downloadGerber.js";
+import { downloadGerber, boardToGerberData } from "../gerber/downloadGerber.js";
 import { downloadRawDataSVG } from "../rawData/downloadSVG.js";
 import { scaleSvgModal } from "../modals/scaleSvgModal.js";
 import { getRawDataBoundingBox } from "../rawData/downloadSVG.js";
+import { rawDataToGerberData } from "../rawData/rawDataToGerberData.js";
 
 export function drawTopBar(state) {
   return html`
@@ -27,7 +28,7 @@ export function drawTopBar(state) {
           </div>
           <div
             class="dropdown-item"
-            @click=${(e) => clickDownloadGerber(state)}
+            @click=${(e) => downloadGerber(boardToGerberData(state.board))}
           >
             Gerber
           </div>
@@ -43,6 +44,12 @@ export function drawTopBar(state) {
             @click=${(e) => clickDownloadRawDataSVG(state)}
           >
             Download SVG
+          </div>
+          <div
+            class="dropdown-item"
+            @click=${(e) => downloadGerber(rawDataToGerberData(state.rawData))}
+          >
+            Download Gerber
           </div>
         </div>
       </div>
@@ -162,10 +169,6 @@ function clickEditJSON(state) {
       setBoard(newBoard);
     },
   });
-}
-
-function clickDownloadGerber(state) {
-  downloadGerber(state);
 }
 
 function clickDownloadRawDataSVG(state) {

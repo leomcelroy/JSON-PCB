@@ -7,19 +7,16 @@ import { generateLayerFile } from "./generateLayerFile.js";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
-export function downloadGerber(state) {
-  const board = state.board;
+export function downloadGerber(gerberData) {
+  generateGerberFiles(gerberData);
+}
 
+export function boardToGerberData(board) {
   const drills = getDrillData(board);
   const { layers, apertures, outline } = getLayerData(board);
   const gerberData = { apertures, layers, drills, outline };
 
-  console.log({
-    board,
-    gerberData,
-  });
-
-  generateGerberFiles(gerberData);
+  return gerberData;
 }
 
 export function generateGerberFiles(pcbData) {
@@ -40,7 +37,7 @@ export function generateGerberFiles(pcbData) {
         layerData: layers[layerName],
         apertures,
         layerName,
-      }),
+      })
     );
   });
 
@@ -51,7 +48,7 @@ export function generateGerberFiles(pcbData) {
       projectName,
       outline: pcbData.outline,
       apertures,
-    }),
+    })
   );
 
   // Drills
@@ -60,7 +57,7 @@ export function generateGerberFiles(pcbData) {
       unitConversionFactor,
       projectName,
       drills: pcbData.drills,
-    }),
+    })
   );
 
   // Create ZIP
