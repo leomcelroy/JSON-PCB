@@ -7,6 +7,9 @@ import { formatCode } from "../formatCode.js";
 import { downloadPNG } from "../download/downloadPNG.js";
 import { downloadText } from "../download/downloadText.js";
 import { downloadGerber } from "../gerber/downloadGerber.js";
+import { downloadRawDataSVG } from "../download/downloadSVG.js";
+import { scaleSvgModal } from "../modals/scaleSvgModal.js";
+import { getRawDataBoundingBox } from "../download/downloadSVG.js";
 
 export function drawTopBar(state) {
   return html`
@@ -29,6 +32,18 @@ export function drawTopBar(state) {
             Gerber
           </div>
           <div class="hidden dropdown-item">Gerber</div>
+        </div>
+      </div>
+
+      <div class="menu-item dropdown">
+        <div class="dropdown-toggle">Raw Data</div>
+        <div class="dropdown-items">
+          <div
+            class="dropdown-item"
+            @click=${(e) => clickDownloadRawDataSVG(state)}
+          >
+            Download SVG
+          </div>
         </div>
       </div>
 
@@ -151,4 +166,24 @@ function clickEditJSON(state) {
 
 function clickDownloadGerber(state) {
   downloadGerber(state);
+}
+
+function clickDownloadRawDataSVG(state) {
+  console.log("clickDownloadRawDataSVG called");
+  const bbox = getRawDataBoundingBox(state.rawData);
+  const currentWidth = bbox.width;
+  const currentHeight = bbox.height;
+
+  scaleSvgModal({
+    currentWidth,
+    currentHeight,
+    layerOrder: state.layerOrder,
+    onDownload: ({ targetWidth, targetHeight, filename, layerOrder }) => {
+      downloadRawDataSVG(state.rawData, state.colorMap, layerOrder, {
+        targetWidth,
+        targetHeight,
+        filename,
+      });
+    },
+  });
 }

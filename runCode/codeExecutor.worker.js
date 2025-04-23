@@ -13,7 +13,7 @@ async function executeDynamicModule(code, board) {
         status: "print",
         data: "[Could not stringify arguments]",
       });
-      console.error("Worker: Error stringifying print arguments:", error);
+      throw error;
     }
   };
 
@@ -33,8 +33,6 @@ async function executeDynamicModule(code, board) {
     const result = await userFunction(board, tk, print, path);
     return result;
   } catch (error) {
-    console.error("Worker: Error executing user code:", error);
-
     throw error;
   }
 }
