@@ -1,10 +1,9 @@
 export function computeArc(currentPos, lastAngle, endPoint, sweepAngleDegrees) {
-  console.log("compute arc");
   if (sweepAngleDegrees === null) {
     const tanCir = findCircle(
       ...currentPos,
       (lastAngle / Math.PI) * 180,
-      ...endPoint,
+      ...endPoint
     );
 
     if (tanCir === null) {
@@ -13,17 +12,17 @@ export function computeArc(currentPos, lastAngle, endPoint, sweepAngleDegrees) {
 
     const startAngle = Math.atan2(
       currentPos[1] - tanCir.centerY,
-      currentPos[0] - tanCir.centerX,
+      currentPos[0] - tanCir.centerX
     );
     const endAngle = Math.atan2(
       endPoint[1] - tanCir.centerY,
-      endPoint[0] - tanCir.centerX,
+      endPoint[0] - tanCir.centerX
     );
 
     const anticlockwise = determineAnticlockwise(
       currentPos,
       lastAngle,
-      endPoint,
+      endPoint
     );
 
     // console.log({ anticlockwise, currentPos, endPoint });
@@ -67,7 +66,7 @@ export function computeArc(currentPos, lastAngle, endPoint, sweepAngleDegrees) {
   const midY = (currentPos[1] + endPoint[1]) / 2;
 
   const midToCenterDist = Math.sqrt(
-    radius * radius - (chordLength / 2) * (chordLength / 2),
+    radius * radius - (chordLength / 2) * (chordLength / 2)
   );
 
   const angleOffset = anticlockwise ? Math.PI / 2 : -Math.PI / 2;
@@ -87,7 +86,7 @@ export function computeArc(currentPos, lastAngle, endPoint, sweepAngleDegrees) {
 
   const startAngle = Math.atan2(
     currentPos[1] - centerY,
-    currentPos[0] - centerX,
+    currentPos[0] - centerX
   );
   const endAngle = Math.atan2(endPoint[1] - centerY, endPoint[0] - centerX);
 

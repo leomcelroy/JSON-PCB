@@ -6,9 +6,13 @@ import { setBoard, patchState } from "../state.js";
 import { formatCode } from "../formatCode.js";
 import { downloadPNG } from "../download/downloadPNG.js";
 import { downloadText } from "../download/downloadText.js";
-import { downloadGerber, boardToGerberData } from "../gerber/downloadGerber.js";
+import {
+  boardToGerberData,
+  generateGerberFiles,
+} from "../gerber/downloadGerber.js";
 import { downloadRawDataSVG } from "../rawData/downloadSVG.js";
 import { scaleSvgModal } from "../modals/scaleSvgModal.js";
+import { scaleGerberModal } from "../modals/scaleGerberModal.js";
 import { getRawDataBoundingBox } from "../rawData/downloadSVG.js";
 import { rawDataToGerberData } from "../rawData/rawDataToGerberData.js";
 
@@ -28,7 +32,7 @@ export function drawTopBar(state) {
           </div>
           <div
             class="dropdown-item"
-            @click=${(e) => downloadGerber(boardToGerberData(state.board))}
+            @click=${(e) => clickDownloadBoardGerber(state)}
           >
             Gerber
           </div>
@@ -37,19 +41,19 @@ export function drawTopBar(state) {
       </div>
 
       <div class="menu-item dropdown">
-        <div class="dropdown-toggle">Raw Data</div>
+        <div class="dropdown-toggle">Export Raw Data</div>
         <div class="dropdown-items">
           <div
             class="dropdown-item"
             @click=${(e) => clickDownloadRawDataSVG(state)}
           >
-            Download SVG
+            SVG
           </div>
           <div
             class="dropdown-item"
-            @click=${(e) => downloadGerber(rawDataToGerberData(state.rawData))}
+            @click=${(e) => clickDownloadRawDataGerber(state)}
           >
-            Download Gerber
+            Gerber
           </div>
         </div>
       </div>
@@ -172,7 +176,6 @@ function clickEditJSON(state) {
 }
 
 function clickDownloadRawDataSVG(state) {
-  console.log("clickDownloadRawDataSVG called");
   const bbox = getRawDataBoundingBox(state.rawData);
   const currentWidth = bbox.width;
   const currentHeight = bbox.height;
@@ -180,6 +183,7 @@ function clickDownloadRawDataSVG(state) {
   scaleSvgModal({
     currentWidth,
     currentHeight,
+    initialMmPerUnit: 25.4,
     layerOrder: state.layerOrder,
     onDownload: ({ targetWidth, targetHeight, filename, layerOrder }) => {
       downloadRawDataSVG(state.rawData, state.colorMap, layerOrder, {
@@ -187,6 +191,44 @@ function clickDownloadRawDataSVG(state) {
         targetHeight,
         filename,
       });
+    },
+  });
+}
+
+function clickDownloadBoardGerber(state) {
+  const board = state.board;
+  const bbox = getBoardBoundingBox(board);
+  const currentWidth = bbox.width;
+  const currentHeight = bbox.height;
+
+  scaleGerberModal({
+    currentWidth,
+    currentHeight,
+    outputUnitLabel: "mm",
+    initialConversionFactor: 1.0,
+    layerOrder: state.layerOrder,
+    onDownload: ({ conversionFactor, filename }) => {
+      const gerberData = boardToGerberData(board);
+      generateGerberFiles(gerberData, conversionFactor, filename);
+    },
+  });
+}
+
+function clickDownloadRawDataGerber(state) {
+  const rawData = state.rawData;
+  const bbox = getRawDataBoundingBox(rawData);
+  const currentWidth = bbox.width;
+  const currentHeight = bbox.height;
+
+  scaleGerberModal({
+    currentWidth,
+    currentHeight,
+    outputUnitLabel: "mm",
+    initialConversionFactor: 1.0,
+    layerOrder: state.layerOrder,
+    onDownload: ({ conversionFactor, filename }) => {
+      const gerberData = rawDataToGerberData(rawData);
+      generateGerberFiles(gerberData, conversionFactor, filename);
     },
   });
 }

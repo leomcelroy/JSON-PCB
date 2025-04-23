@@ -54,12 +54,16 @@ export function rawDataToGerberData(rawData) {
     });
   });
 
-  return {
+  const gerberData = {
     apertures,
     layers,
     outline,
     drills,
   };
+
+  console.log(gerberData);
+
+  return gerberData;
 
   function getLayer(layerStr) {
     if (layerStr in layers) return layers[layerStr];

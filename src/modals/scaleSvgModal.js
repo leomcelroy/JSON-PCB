@@ -2,42 +2,85 @@ import { html, render } from "lit-html";
 import { patchState } from "../state.js"; // Assuming patchState updates UI if needed
 
 export function scaleSvgModal({
-  currentWidth,
-  currentHeight,
+  currentWidth, // in original units
+  currentHeight, // in original units
+  initialMmPerUnit,
   onDownload,
   layerOrder,
 }) {
-  console.log("scaleSvgModal called", { currentWidth, currentHeight });
+  console.log("scaleSvgModal called", {
+    currentWidth,
+    currentHeight,
+    initialMmPerUnit,
+  });
+  let currentMmPerUnit = initialMmPerUnit || 1.0; // Default if not provided
+
   const closeModal = () => {
     console.log("Closing modal");
     render(html``, document.getElementById("modal-container"));
     // patchState(); // Re-render if necessary
   };
 
+  // Updated to only display calculated mm based on mmPerUnit
+  const updateDisplayedDimensions = () => {
+    const mmPerUnitInput = document.getElementById("mmPerUnitInput");
+    const widthMmDisplay = document.getElementById("widthMmDisplay");
+    const heightMmDisplay = document.getElementById("heightMmDisplay");
+
+    const mmPerUnit = mmPerUnitInput?.value
+      ? parseFloat(mmPerUnitInput.value)
+      : currentMmPerUnit;
+
+    if (isNaN(mmPerUnit) || mmPerUnit <= 0) {
+      widthMmDisplay.textContent = "Invalid mm/Unit";
+      heightMmDisplay.textContent = "Invalid mm/Unit";
+      return;
+    }
+
+    // Calculate dimensions in mm
+    const widthMm = (currentWidth * mmPerUnit).toFixed(2);
+    const heightMm = (currentHeight * mmPerUnit).toFixed(2);
+
+    widthMmDisplay.textContent = `${widthMm} mm`;
+    heightMmDisplay.textContent = `${heightMm} mm`;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.target;
     const filename = form.filename.value || "rawData.svg";
-    const widthInput = form.width.value;
-    const heightInput = form.height.value;
+    const mmPerUnitInput = form.mmPerUnit.value;
 
-    // Basic validation: ensure at least one dimension is entered
-    if (!widthInput && !heightInput) {
-      alert("Please enter at least one dimension (width or height).");
+    const mmPerUnit = mmPerUnitInput
+      ? parseFloat(mmPerUnitInput)
+      : currentMmPerUnit;
+
+    if (isNaN(mmPerUnit) || mmPerUnit <= 0) {
+      alert("Please enter a valid positive number for MM per Unit.");
       return;
     }
 
-    const targetWidth = widthInput ? parseFloat(widthInput) : null;
-    const targetHeight = heightInput ? parseFloat(heightInput) : null;
+    // Dimensions in original units are now just the current dimensions
+    const targetWidthInUnits = currentWidth;
+    const targetHeightInUnits = currentHeight;
 
     // Ensure filename ends with .svg
     const finalFilename = filename.toLowerCase().endsWith(".svg")
       ? filename
       : `${filename}.svg`;
 
+    console.log("Download triggered with:", {
+      targetWidthInUnits,
+      targetHeightInUnits,
+      mmPerUnit,
+      filename: finalFilename,
+    });
+
+    // Pass original units dimensions and the scaling factor
     onDownload({
-      targetWidth,
-      targetHeight,
+      targetWidth: targetWidthInUnits,
+      targetHeight: targetHeightInUnits,
+      mmPerUnit: mmPerUnit,
       filename: finalFilename,
       layerOrder,
     });
@@ -45,6 +88,7 @@ export function scaleSvgModal({
   };
 
   console.log("Attempting to render modal...");
+
   const template = html`
     <div
       class="fixed inset-0 bg-gray-700 opacity-50 z-40"
@@ -54,10 +98,13 @@ export function scaleSvgModal({
       class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-50 text-black min-w-[350px]"
     >
       <h3 class="text-lg font-semibold mb-4">Scale SVG Download</h3>
-      <form @submit=${handleSubmit}>
+      <form @submit=${handleSubmit} @input=${updateDisplayedDimensions}>
+        <p class="text-sm text-gray-600 mb-2">
+          Original size: ${currentWidth.toFixed(2)} x
+          ${currentHeight.toFixed(2)} units.
+        </p>
         <p class="text-sm text-gray-600 mb-4">
-          Enter desired dimensions (in mm). Leave one blank to maintain aspect
-          ratio.
+          Enter MM per Unit to determine the final dimensions.
         </p>
         <div class="mb-4">
           <label
@@ -76,34 +123,30 @@ export function scaleSvgModal({
         </div>
         <div class="mb-4">
           <label
-            for="width"
+            for="mmPerUnitInput"
             class="block text-sm font-medium text-gray-700 mb-1"
-            >Width (mm):</label
+            >MM per Unit:</label
           >
           <input
             type="number"
-            id="width"
-            name="width"
+            id="mmPerUnitInput"
+            name="mmPerUnit"
             step="any"
-            placeholder="${currentWidth.toFixed(2)}"
+            value="${currentMmPerUnit}"
+            required
             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
-        <div class="mb-4">
-          <label
-            for="height"
-            class="block text-sm font-medium text-gray-700 mb-1"
-            >Height (mm):</label
-          >
-          <input
-            type="number"
-            id="height"
-            name="height"
-            step="any"
-            placeholder="${currentHeight.toFixed(2)}"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          />
+        <div class="mb-4 p-3 bg-gray-100 rounded border border-gray-200">
+          <p class="text-sm font-medium text-gray-800">Resulting Dimensions:</p>
+          <p class="text-sm text-gray-600 mt-1">
+            Width: <span id="widthMmDisplay">--- mm</span>
+          </p>
+          <p class="text-sm text-gray-600">
+            Height: <span id="heightMmDisplay">--- mm</span>
+          </p>
         </div>
+
         <div class="flex justify-end mt-6">
           <button
             type="button"
@@ -133,7 +176,8 @@ export function scaleSvgModal({
 
   render(template, modalContainer);
   console.log("Modal render call complete.");
-  // patchState(); // Re-render if necessary
+  // Call initial update to display correct dimensions based on initial mmPerUnit
+  updateDisplayedDimensions();
 }
 
 // Basic styles (add to your CSS)

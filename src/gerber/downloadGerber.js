@@ -7,8 +7,12 @@ import { generateLayerFile } from "./generateLayerFile.js";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
-export function downloadGerber(gerberData) {
-  generateGerberFiles(gerberData);
+export function downloadGerber(
+  gerberData,
+  conversionFactor = 1.0,
+  filename = "Gerbers.zip"
+) {
+  generateGerberFiles(gerberData, conversionFactor, filename);
 }
 
 export function boardToGerberData(board) {
@@ -19,10 +23,10 @@ export function boardToGerberData(board) {
   return gerberData;
 }
 
-export function generateGerberFiles(pcbData) {
+export function generateGerberFiles(pcbData, conversionFactor, filename) {
   const { layers, name, apertures, drills, outline } = pcbData;
 
-  const unitConversionFactor = 25.4; // TODO: should pull this from file
+  const unitConversionFactor = conversionFactor;
 
   const projectName = name ?? "anon";
 
@@ -46,7 +50,7 @@ export function generateGerberFiles(pcbData) {
     ...generateOutlineFile({
       unitConversionFactor,
       projectName,
-      outline: pcbData.outline,
+      outline: outline,
       apertures,
     })
   );
@@ -56,12 +60,12 @@ export function generateGerberFiles(pcbData) {
     ...generateDrillFile({
       unitConversionFactor,
       projectName,
-      drills: pcbData.drills,
+      drills: drills,
     })
   );
 
   // Create ZIP
   zip.generateAsync({ type: "blob" }).then((content) => {
-    saveAs(content, `${projectName}-Gerbers.zip`);
+    saveAs(content, filename);
   });
 }
