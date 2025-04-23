@@ -1,34 +1,6 @@
 import { patchState } from "../state.js";
 
 export function setRawData({ regions, traces, routes }) {
-  /*
-    region
-    {
-      contour: pl,
-      polarity: "+" | "-"
-      layers: [],
-      maskOffset: 0,
-    }
-
-    traces
-    {
-      track: pl,
-      diameter: 0.014,
-      layers: [],
-      polarity: "+" | "-", // Polarity for traces might indicate etching direction or other properties
-      maskOffset: 0,
-    }
-
-    routes/drills
-    {
-      track: pl,
-      diameter: 0.014,
-      start: "F.Cu",
-      end: "B.Cu",
-      plated: true,
-    }
-
-  */
   const layerMap = {};
   // Initialize layerMap with all potential layers from regions and traces
   const allLayers = new Set([

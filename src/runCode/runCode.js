@@ -1,4 +1,4 @@
-import { setRawData } from "../actions/setRawData.js";
+import { setRawData } from "../rawData/setRawData.js";
 
 let worker = null;
 let running = false;

@@ -7,9 +7,9 @@ import { formatCode } from "../formatCode.js";
 import { downloadPNG } from "../download/downloadPNG.js";
 import { downloadText } from "../download/downloadText.js";
 import { downloadGerber } from "../gerber/downloadGerber.js";
-import { downloadRawDataSVG } from "../download/downloadSVG.js";
+import { downloadRawDataSVG } from "../rawData/downloadSVG.js";
 import { scaleSvgModal } from "../modals/scaleSvgModal.js";
-import { getRawDataBoundingBox } from "../download/downloadSVG.js";
+import { getRawDataBoundingBox } from "../rawData/downloadSVG.js";
 
 export function drawTopBar(state) {
   return html`

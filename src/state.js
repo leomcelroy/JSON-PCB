@@ -20,7 +20,7 @@ import { getBoardBoundingBox } from "./boardHelpers/getBoardBoundingBox.js";
 import { drawLayer } from "./views/drawLayer.js";
 import { drawComponents } from "./views/drawComponents.js";
 import { processComponent } from "./processComponent.js";
-import { drawRawData } from "./views/drawRawData.js";
+import { drawRawData } from "./rawData/drawRawData.js";
 
 export const STATE = {
   colorMap: {
@@ -178,13 +178,37 @@ export const renderLoop = () => {
   drawRawDataToCanvas(STATE);
 };
 
+const throttle = (func, limit) => {
+  let lastFunc;
+  let lastRan;
+  return function (...args) {
+    const context = this;
+    if (!lastRan) {
+      func.apply(context, args);
+      lastRan = Date.now();
+    } else {
+      clearTimeout(lastFunc);
+      lastFunc = setTimeout(function () {
+        if (Date.now() - lastRan >= limit) {
+          func.apply(context, args);
+          lastRan = Date.now();
+        }
+      }, limit - (Date.now() - lastRan));
+    }
+  };
+};
+
+const throttledRender = throttle((state) => {
+  r(view(state), document.body);
+  drawRawDataToCanvas(state);
+}, 16); // ~60 FPS
+
 function render(state) {
   window.requestAnimationFrame(() => {
+    // throttledRender(state);
     r(view(state), document.body);
-
     // render canvas
     // renderToCanvas(state);
-
     drawRawDataToCanvas(STATE);
   });
 }
