@@ -20,6 +20,7 @@ import { getBoardBoundingBox } from "./boardHelpers/getBoardBoundingBox.js";
 import { drawLayer } from "./views/drawLayer.js";
 import { drawComponents } from "./views/drawComponents.js";
 import { processComponent } from "./processComponent.js";
+import { drawRawData } from "./views/drawRawData.js";
 
 export const STATE = {
   colorMap: {
@@ -54,6 +55,12 @@ export const STATE = {
     handles: false,
     componentLabels: false,
     padLabels: false,
+  },
+  rawData: {
+    layers: [], // [layerName, { positive: [], negative: [] }]
+    regions: [],
+    traces: [],
+    routes: [],
   },
 };
 
@@ -167,7 +174,8 @@ export function patchState(fn = null) {
 
 export const renderLoop = () => {
   requestAnimationFrame(renderLoop);
-  renderToCanvas(STATE);
+  // renderToCanvas(STATE);
+  drawRawDataToCanvas(STATE);
 };
 
 function render(state) {
@@ -176,6 +184,8 @@ function render(state) {
 
     // render canvas
     // renderToCanvas(state);
+
+    drawRawDataToCanvas(STATE);
   });
 }
 
@@ -281,6 +291,35 @@ function renderToCanvas(state) {
       y: panZoomFns.y(),
     });
   }
+}
+
+function drawRawDataToCanvas(state) {
+  const canvas = document.querySelector(".workarea-canvas");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const { rawData, colorMap, layerOrder, panZoomFns, layerNotVisible } = state;
+
+  Object.entries(rawData.layers)
+    .sort(([layerA], [layerB]) => {
+      const indexA = layerOrder.indexOf(layerA);
+      const indexB = layerOrder.indexOf(layerB);
+      return indexB - indexA;
+    })
+    .forEach(([layer, tracesRegions]) => {
+      if (layerNotVisible.has(layer)) return;
+
+      drawRawData({
+        rawData,
+        tracesRegions,
+        color: colorMap[layer],
+        tempCanvas: document.querySelector(".workarea-canvas-temp"),
+        canvas,
+        scale: panZoomFns.scale(),
+        x: panZoomFns.x(),
+        y: panZoomFns.y(),
+      });
+    });
 }
 
 /* SET JSON */

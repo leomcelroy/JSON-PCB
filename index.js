@@ -22,7 +22,7 @@ function init(state) {
   r(view(state), document.body);
 
   resizeCanvas();
-  renderLoop();
+  // renderLoop();
 
   const editor = document.querySelector(".code-editor");
   initCodeEditor(editor);

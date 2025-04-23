@@ -124,11 +124,13 @@ export function addPointDragging(el) {
       s.editPath.data.trackOrContourData = newData;
     });
 
-    setBoard(STATE.board);
+    patchState();
   });
 
   listener("mouseup", "", (e) => {
     if (dragging === false) return;
+
+    setBoard(STATE.board);
 
     if (selectedPoints().size === 1) {
       patchState((state) => {

@@ -98,7 +98,7 @@ export function view(state) {
         </div>
       </div>
       <div class="workarea no-select">
-        <canvas class="workarea-canvas-temp"></canvas>
+        <canvas class="workarea-canvas-temp invisible"></canvas>
         <canvas class="workarea-canvas"></canvas>
         <svg class="workarea-svg">
           <rect
@@ -127,7 +127,7 @@ export function view(state) {
 }
 
 function drawTransformGroup(state) {
-  return "";
+  // return "";
   return svg`
     <g class="transform-group">
       <g stroke="black" stroke-width="${2 / (state?.panZoomFns?.scale() ?? 1)}">
