@@ -50,7 +50,7 @@ function createWorker() {
     running = false;
 
     if (status === "success") {
-      console.log(data.result.rawData);
+      // console.log(data.result.rawData);
       setRawData(data.result.rawData);
       return;
     }

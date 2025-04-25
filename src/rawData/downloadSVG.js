@@ -27,17 +27,17 @@ export function getRawDataBoundingBox(rawData) {
   rawData.traces.forEach((t) => updateBounds(t.track, t.diameter));
   rawData.routes.forEach((rt) => updateBounds(rt.track, rt.diameter));
 
-  if (xMin === Infinity) return { x: 0, y: 0, width: 100, height: 100 }; // Default if no data
+  if (xMin === Infinity || yMin === Infinity) {
+    // Return a default box if no valid bounds found
+    return { x: 0, y: 0, width: 100, height: 100 };
+  }
 
-  // Adjust for SVG coordinate system (flip y)
-  const svgYMin = -yMax;
-  const svgYMax = -yMin;
-
+  // Return bounds in the original coordinate system (y increases upwards)
   return {
     x: xMin,
-    y: svgYMin, // Use the flipped min coordinate for SVG y
+    y: yMin, // Minimum y in original coordinates
     width: xMax - xMin,
-    height: svgYMax - svgYMin, // Height remains the same
+    height: yMax - yMin, // Height in original coordinates
   };
 }
 
@@ -60,13 +60,21 @@ export function downloadRawDataSVG(
   }
 
   const bbox = getRawDataBoundingBox(rawData);
-  const margin = Math.max(bbox.width, bbox.height) * 0.05; // Add 5% margin
+  // Use bbox dimensions directly as the base for SVG size
+  let baseWidth = bbox.width;
+  let baseHeight = bbox.height;
 
-  // Calculate final dimensions for SVG element, maintaining aspect ratio if one is missing
-  let finalWidth = bbox.width + 2 * margin;
-  let finalHeight = bbox.height + 2 * margin;
-  const aspectRatio = bbox.width / bbox.height;
+  // Handle zero dimensions gracefully
+  if (baseWidth <= 0) baseWidth = 100;
+  if (baseHeight <= 0) baseHeight = 100;
 
+  const aspectRatio = baseWidth / baseHeight;
+
+  // Calculate final dimensions, allowing user override
+  let finalWidth = baseWidth;
+  let finalHeight = baseHeight;
+
+  // Adjust dimensions based on user options, maintaining aspect ratio if only one is given
   if (userWidth && !userHeight) {
     finalWidth = userWidth;
     finalHeight = userWidth / aspectRatio;
@@ -74,17 +82,36 @@ export function downloadRawDataSVG(
     finalWidth = userHeight * aspectRatio;
     finalHeight = userHeight;
   } else if (userWidth && userHeight) {
-    finalWidth = userWidth; // Use user-provided dimensions even if aspect ratio changes
+    // Use user-provided dimensions directly
+    finalWidth = userWidth;
     finalHeight = userHeight;
   }
-  // If neither is provided, use original bbox dimensions + margin
+
+  // Calculate scaling factors and offsets for coordinate transformation
+  const scaleX = finalWidth / baseWidth;
+  const scaleY = finalHeight / baseHeight; // Y scale might differ if aspect ratio changes
+  const dataXMin = bbox.x;
+  const dataYMax = bbox.y + bbox.height; // Top Y in original coordinates
+
+  // Transformation function: Original (x, y) -> SVG (sx, sy)
+  // Applies scaling, y-flip, and translation
+  const transformPoint = (p) => {
+    const sx = (p[0] - dataXMin) * scaleX;
+    const sy = (dataYMax - p[1]) * scaleY; // Y is flipped and scaled
+    return [sx, sy];
+  };
+
+  // Function to convert a polyline to SVG points string using transformation
+  const transformPolylineToPointsString = (polyline) => {
+    return polyline
+      .map(transformPoint)
+      .map((p) => `${p[0]},${p[1]}`)
+      .join(" ");
+  };
 
   const svgParts = [];
   svgParts.push(`<svg
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="${bbox.x - margin} ${bbox.y - margin} ${bbox.width + 2 * margin} ${
-    bbox.height + 2 * margin
-  }"
     width="${finalWidth}mm"
     height="${finalHeight}mm"
     style="background-color: #222;"
@@ -103,7 +130,8 @@ export function downloadRawDataSVG(
     // Positive Regions
     layerData.positive.regions.forEach((index) => {
       const region = regions[index];
-      const points = polylineToPointsString(region.contour);
+      // Transform region points
+      const points = transformPolylineToPointsString(region.contour);
       svgParts.push(
         `    <polygon points="${points}" fill="${color}" stroke="none" />`
       );
@@ -112,16 +140,17 @@ export function downloadRawDataSVG(
     // Positive Traces
     layerData.positive.traces.forEach((index) => {
       const trace = traces[index];
-      const points = polylineToPointsString(trace.track);
+      const points = transformPolylineToPointsString(trace.track);
+      const scaledStrokeWidth = trace.diameter * scaleX; // Scale stroke width
       svgParts.push(
-        `    <polyline points="${points}" stroke-width="${trace.diameter}" />`
+        `    <polyline points="${points}" stroke-width="${scaledStrokeWidth}" style="stroke-linecap: round; stroke-linejoin: round;"/>`
       );
     });
 
     // Negative Regions (rendered same as positive for simplicity)
     layerData.negative.regions.forEach((index) => {
       const region = regions[index];
-      const points = polylineToPointsString(region.contour);
+      const points = transformPolylineToPointsString(region.contour);
       // Note: Representing negative regions accurately (knockout) in SVG can be complex.
       // This renders them as filled polygons for now. Could use masks or clipPaths.
       svgParts.push(
@@ -132,10 +161,11 @@ export function downloadRawDataSVG(
     // Negative Traces (rendered same as positive for simplicity)
     layerData.negative.traces.forEach((index) => {
       const trace = traces[index];
-      const points = polylineToPointsString(trace.track);
+      const points = transformPolylineToPointsString(trace.track);
+      const scaledStrokeWidth = trace.diameter * scaleX; // Scale stroke width
       // Note: Representing negative traces accurately (knockout) in SVG can be complex.
       svgParts.push(
-        `    <polyline points="${points}" stroke-width="${trace.diameter}" style="opacity:0.5;" />`
+        `    <polyline points="${points}" stroke-width="${scaledStrokeWidth}" style="opacity:0.5;" />`
       ); // Example: slightly different style
     });
 
@@ -148,10 +178,23 @@ export function downloadRawDataSVG(
     const routeColor = "#cccccc"; // Example default color for routes
     svgParts.push(`  <g id="routes" fill="none" stroke="${routeColor}">`);
     routes.forEach((route, index) => {
-      const points = polylineToPointsString(route.track);
-      svgParts.push(
-        `    <polyline points="${points}" stroke-width="${route.diameter}" />`
-      );
+      if (route.track.length === 1) {
+        const [x, y] = route.track[0];
+        const [sx, sy] = transformPoint([x, y]); // Transform the point
+        const scaledRadius = (route.diameter / 2) * scaleX; // Scale radius
+        // Draw a circle for single-point routes
+        // Use routeColor for fill, not stroke, to represent a filled point
+        svgParts.push(
+          `    <circle cx="${sx}" cy="${sy}" r="${scaledRadius}" fill="${routeColor}" stroke="none" />`
+        );
+      } else {
+        // Draw a polyline for multi-point routes
+        const points = transformPolylineToPointsString(route.track);
+        const scaledStrokeWidth = route.diameter * scaleX; // Scale stroke width
+        svgParts.push(
+          `    <polyline points="${points}" stroke-width="${scaledStrokeWidth}" />`
+        );
+      }
     });
     svgParts.push(`  </g>`);
   }

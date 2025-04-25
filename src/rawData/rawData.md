@@ -31,3 +31,19 @@ routes/drills
 }
 
 ```
+
+---
+
+path
+
+```
+[
+  [ "start", x, y, ?[ "fillet" | "chamfer" | "biarc", radius] ],
+  [ "absolute", x, y],
+  [ "relative", dx, dy],
+  ?[ "polarAbsolute", angle, distance ],
+  ?[ "polarRelative", angle, distance ],
+  ?[ "arc", x, y, bulge | sweepAngle ],
+  [ "close" ]
+]
+```

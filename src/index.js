@@ -7,6 +7,7 @@ import { addLayerReordering } from "./events/addLayerReordering.js";
 import { addPathCreation } from "./events/addPathCreation.js";
 import { addDropUpload } from "./events/addDropUpload.js";
 import { addCodeCaching } from "./events/addCodeCaching.js";
+import { addNumberScrubbing } from "./events/addNumberScrubbing.js";
 
 import { initCodeEditor } from "./initCodeEditor.js";
 
@@ -27,6 +28,7 @@ function init(state) {
   const editor = document.querySelector(".code-editor");
   initCodeEditor(editor);
   addCodeCaching(editor);
+  addNumberScrubbing(document.body, editor.cm);
 
   const svg = document.querySelector(".workarea-svg");
 

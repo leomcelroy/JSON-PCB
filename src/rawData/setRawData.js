@@ -38,6 +38,8 @@ export function setRawData({ regions, traces, routes }) {
   });
 
   patchState((s) => {
+    s.rawData = null;
+    s.rawData = {};
     s.rawData.regions = regions;
     s.rawData.traces = traces;
     s.rawData.routes = routes;

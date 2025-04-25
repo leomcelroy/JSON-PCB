@@ -1,5 +1,9 @@
 # DEV LOG
 
+### April 24, 2025
+
+- Memory leak from console.log
+
 ### Feb. 11, 2025
 
 - need to handle mask offsets in component imports and gerber file generation
@@ -116,7 +120,6 @@ Maybe there is a lower limit on text size.
 
 Also decided to make `layer` into `layers`
 
-
 ### Oct 2, 2024
 
 How to handle footprints listing multiple layers.
@@ -150,15 +153,15 @@ I need to think about how to select multiple things at once.
 I need to add information to pads what should I add?
 In SVG-PCB they had this
 
-  - drills
-  - flip
-  - footprint
-  - id
-  - layers
-  - padShapes
-  - padLocations
-  - rotation
-  - position
+- drills
+- flip
+- footprint
+- id
+- layers
+- padShapes
+- padLocations
+- rotation
+- position
 
 - should regions and traces be able to be on multiple layers
 - why do components have seperate layers but regions don't
@@ -170,7 +173,7 @@ In SVG-PCB they had this
   - I like having some parity with close
   - Start is maybe the most clear, also implies it doesn't need to be closed
   - move fillet from close to start, that way fillet is on controlPoint of cmd
-- add checks that start and close are first and last 
+- add checks that start and close are first and last
 - compare `renderCanvas` and `computeArc`
 
 - to add
@@ -321,21 +324,21 @@ renderPCB({
 ```
 
 ```js
-pt(0, 0)
+pt(0, 0);
 
 path(
   ["point", [0, 0]],
-  ["fillet", .3, [1, 1]],
-  ["cubic", [ .2, .3 ], [ .5, .4 ], [5, 3 ] ],
-  ["chamfer", .3, [ 3, 4 ]],
+  ["fillet", 0.3, [1, 1]],
+  ["cubic", [0.2, 0.3], [0.5, 0.4], [5, 3]],
+  ["chamfer", 0.3, [3, 4]]
   // [ "arc", center, end ]
-)
+);
 
 inputs({
   name,
   value,
-  type // range(min: num, max: num, step: num), number, text, option(options: str[])
-})
+  type, // range(min: num, max: num, step: num), number, text, option(options: str[])
+});
 ```
 
 ```js
@@ -372,21 +375,17 @@ or like existing function
 ```js
 path(
   ["point", [0, 0]],
-  ["fillet", .3, [1, 1]],
-  ["cubic", [ .2, .3 ], [ .5, .4 ], [5, 3 ] ],
-  ["chamfer", .3, [ 3, 4 ]],
+  ["fillet", 0.3, [1, 1]],
+  ["cubic", [0.2, 0.3], [0.5, 0.4], [5, 3]],
+  ["chamfer", 0.3, [3, 4]]
   // [ "arc", center, end ]
-)
+);
 ```
 
 or just polylines
 
 ```js
-[
-  [
-    [x, y]
-  ]
-]
+[[[x, y]]];
 ```
 
 ### More Gerber Like
@@ -451,7 +450,7 @@ or just polylines
     // }
   ],
 
-  // can a trace have a polarity? 
+  // can a trace have a polarity?
   traces: [ // wires? can I do silk in here, what about outlines?
     {
       track: [ "moveTo", "lineTo", "arcTo" ],
@@ -481,16 +480,16 @@ or just polylines
     // outlines
     // "Edge.Cuts", interior, edge, cuts, outline, mechanical, dimension
     // this means we'll have to perform offsetting operations
-    
+
     {
       contour: [ "moveTo", "lineTo", "arcTo" ],
       polarity: "+", // negative: false
-      layer: "outline" 
+      layer: "outline"
     },
     {
       contour: [ "moveTo", "lineTo", "arcTo" ], // add moutning holes
       polarity: "-", // negative: true
-      layer: "outline" 
+      layer: "outline"
     }
 
   ],
@@ -539,9 +538,9 @@ Should I have regions with polarity?
   layer: "F.Cu",
   clearance: .1,
 }
-````
+```
 
-Doesn't fill negative polarity regions. 
+Doesn't fill negative polarity regions.
 Clearance is for tracks only.
 
 ### Outline
@@ -559,7 +558,6 @@ Why not do it like this?
 
 If outlines are tracks I have to offset based on the thickness of the cutting tool or dimensions will be off.
 
-
 ### Contours
 
 Contours can not be self intersecting and also must be closed
@@ -575,7 +573,7 @@ need a function which can verify structure of text
 EDITORS
 
 - footprint editor
-- 
+-
 
 OBJECTIVES
 
@@ -588,7 +586,6 @@ OBJECTIVES
 - on interaction end or run do eval
 - during interaction modify the board tree directly
 - createPCB expects valid json
-
 
 ```js
 board.addRegion({
@@ -606,4 +603,3 @@ board.addOutline({ // ?addCutout
   contour: [...],
 });
 ```
-

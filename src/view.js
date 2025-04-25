@@ -59,6 +59,7 @@ export function view(state) {
           Format
         </div>
         <div
+          run-code-trigger
           @click=${(e) => {
             const editorContainer = document.querySelector(".code-editor");
             const code = editorContainer.cm.state.doc.toString();
