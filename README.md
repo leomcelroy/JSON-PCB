@@ -8,7 +8,7 @@ I've made a few EDA tools like [SVG-PCB](https://github.com/leomcelroy/svg-pcb) 
 
 While SVG-PCB works for describing boards programatically I wanted a scripting target that wasn't linked to a particular runtime.
 
-I also noticed many SVG-PCB users weren't writing scripts at all and instead jsut using the GUI. When extending these features in SVG-PCB the editor becomes
+I also noticed many SVG-PCB users weren't writing scripts at all and instead just using the GUI. When extending these features in SVG-PCB the editor becomes
 quite heavy handed in modifying portions of users code.
 
 These two things made me want to make this. It doesn't replace SVG-PCB. It just has different design principles.
