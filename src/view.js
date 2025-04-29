@@ -128,7 +128,6 @@ export function view(state) {
 }
 
 function drawTransformGroup(state) {
-  // return "";
   return svg`
     <g class="transform-group">
       <g stroke="black" stroke-width="${2 / (state?.panZoomFns?.scale() ?? 1)}">
@@ -155,7 +154,6 @@ function drawTransformGroup(state) {
 }
 
 function renderBoardBBox(state) {
-  return "";
   if (!state.board) return "";
 
   const { xMin, xMax, yMin, yMax } = state.board.boundingBox;

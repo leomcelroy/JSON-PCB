@@ -57,7 +57,7 @@ export const STATE = {
     padLabels: false,
   },
   rawData: {
-    layers: [], // [layerName, { positive: [], negative: [] }]
+    layers: [], // Map(layerName, { positive: [], negative: [] })
     regions: [],
     traces: [],
     routes: [],

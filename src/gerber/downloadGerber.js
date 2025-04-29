@@ -1,6 +1,9 @@
 import { getDrillData } from "./getDrillData.js";
 import { getLayerData } from "./getLayerData.js";
-import { generateDrillFile } from "./generateDrillFile.js";
+import {
+  generatePlatedDrillFile,
+  generateNonplatedDrillFile,
+} from "./generateDrillFile.js";
 import { generateOutlineFile } from "./generateOutlineFile.js";
 import { generateLayerFile } from "./generateLayerFile.js";
 
@@ -25,6 +28,8 @@ export function boardToGerberData(board) {
 
 export function generateGerberFiles(pcbData, conversionFactor, filename) {
   const { layers, name, apertures, drills, outline } = pcbData;
+
+  console.log("drills");
 
   const unitConversionFactor = conversionFactor;
 
@@ -55,12 +60,42 @@ export function generateGerberFiles(pcbData, conversionFactor, filename) {
     })
   );
 
+  const platedDrills = [];
+  const nonplatedDrills = [];
+  const platedRouts = [];
+  const nonplatedRouts = [];
+
+  drills.forEach((drill) => {
+    const isRout = drill.track.flat().length === 1;
+    if (isRout && drill.plated) {
+      platedRouts.push(drill);
+    } else if (isRout && !drill.plated) {
+      nonplatedRouts.push(drill);
+    } else if (!isRout && drill.plated) {
+      platedDrills.push(drill);
+    } else if (!isRout && !drill.plated) {
+      nonplatedDrills.push(drill);
+    }
+  });
+
+  if (platedRouts.length > 0 || nonplatedRouts.length > 0) {
+    console.warn("Routs are not yet supported.");
+  }
+
   // Drills
   zip.file(
-    ...generateDrillFile({
+    ...generatePlatedDrillFile({
       unitConversionFactor,
       projectName,
-      drills: drills,
+      drills: platedDrills,
+    })
+  );
+
+  zip.file(
+    ...generateNonplatedDrillFile({
+      unitConversionFactor,
+      projectName,
+      drills: nonplatedDrills,
     })
   );
 
