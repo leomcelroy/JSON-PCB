@@ -1,4 +1,5 @@
-import { setRawData } from "../rawData/setRawData.js";
+// import { setRawData } from "../rawData/setRawData.js";
+import { setBoard } from "../setBoard/setBoard.js";
 
 let worker = null;
 let running = false;
@@ -11,8 +12,7 @@ export function runCode(code, state, onComplete) {
   }
 
   const board = state.board;
-  // const cleanBoard = JSON.parse(JSON.stringify(board, removeExtraData));
-  // const request = { code, board: cleanBoard };
+
   const request = { code, board };
 
   latestRequest = request;
@@ -22,14 +22,6 @@ export function runCode(code, state, onComplete) {
     running = true;
     latestRequest = null;
   }
-}
-
-function removeExtraData(key, value) {
-  if (key === "shapes") return undefined;
-  if (key === "boundingBox") return undefined;
-  if (key === "pathData") return undefined;
-
-  return value;
 }
 
 function createWorker() {
@@ -51,7 +43,11 @@ function createWorker() {
 
     if (status === "success") {
       // console.log(data.result.rawData);
-      setRawData(data.result.rawData);
+      // setRawData(data.result.rawData);
+
+      console.log({ codeResult: data.result });
+
+      setBoard(data.result);
       return;
     }
 

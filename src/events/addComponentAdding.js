@@ -1,12 +1,8 @@
-import { patchState, setBoard, STATE } from "../state.js";
+import { patchState } from "../state.js";
 import { makePhantom } from "../makePhantom.js";
-
-function round(num, ops = {}) {
-  const decimalPlaces = ops.decimalPlaces ?? 2;
-
-  const factor = Math.pow(10, decimalPlaces);
-  return Math.round(num * factor) / factor;
-}
+import { createListener } from "../utils/createListener.js";
+import { round } from "../utils/round.js";
+import { setBoard } from "../setBoard/setBoard.js";
 
 export function addComponentAdding(el) {
   function getPoint(e) {
@@ -70,12 +66,3 @@ export function addComponentAdding(el) {
     }
   );
 }
-
-const trigger = (e) => e.composedPath()[0];
-const matchesTrigger = (e, selectorString) =>
-  trigger(e).matches(selectorString);
-const createListener = (target) => (eventName, selectorString, event) => {
-  target.addEventListener(eventName, (e) => {
-    if (selectorString === "" || matchesTrigger(e, selectorString)) event(e);
-  });
-};

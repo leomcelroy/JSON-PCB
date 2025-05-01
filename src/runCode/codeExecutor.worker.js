@@ -2,35 +2,40 @@ import { toolkit as tk } from "../polylineToolkit/toolkit";
 import { path } from "../path.js";
 
 async function executeDynamicModule(code, board) {
-  const print = (...args) => {
-    try {
-      const stringifiedArgs = args
-        .map((arg) => JSON.stringify(arg, null, 2))
-        .join(" ");
-      self.postMessage({ status: "print", data: stringifiedArgs });
-    } catch (error) {
-      self.postMessage({
-        status: "print",
-        data: "[Could not stringify arguments]",
-      });
-      throw error;
-    }
+  const included = {
+    board,
+    tk,
+    path,
+    print(...args) {
+      try {
+        const stringifiedArgs = args
+          .map((arg) => JSON.stringify(arg, null, 2))
+          .join(" ");
+        self.postMessage({ status: "print", data: stringifiedArgs });
+      } catch (error) {
+        self.postMessage({
+          status: "print",
+          data: "[Could not stringify arguments]",
+        });
+        throw error;
+      }
+    },
+    setBoard(board) {
+      self.postMessage({ status: "success", result: board });
+    },
   };
 
   try {
     const userFunction = new Function(
-      "board",
-      "tk",
-      "print",
-      "path",
+      ...Object.keys(included),
       `
-      return (async () => {
-        ${code}
-      })();
-    `
+        return (async () => {
+          ${code}
+        })();
+      `
     );
 
-    const result = await userFunction(board, tk, print, path);
+    const result = await userFunction(...Object.values(included));
     return result;
   } catch (error) {
     throw error;
@@ -41,9 +46,7 @@ self.onmessage = async (event) => {
   const { code, board } = event.data;
 
   try {
-    const result = await executeDynamicModule(code, board);
-
-    self.postMessage({ status: "success", result });
+    await executeDynamicModule(code, board);
   } catch (error) {
     self.postMessage({ status: "error", error: error.message });
   }

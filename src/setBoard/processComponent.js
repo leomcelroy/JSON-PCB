@@ -2,9 +2,9 @@ import {
   translateShapes,
   rotateShapes,
   flipShapes,
-} from "./shapeTransformations.js";
-import { getShapesBoundingBox } from "./boardHelpers/getShapesBoundingBox.js";
-import { shapesToPathData } from "./views/renderShapesToSVG.js";
+} from "../shapeTransformations.js";
+import { getShapesBoundingBox } from "../boardHelpers/getShapesBoundingBox.js";
+import { shapesToPathData } from "../views/renderShapesToSVG.js";
 
 export function processComponent(comp, board) {
   const footprint = board.footprints.find((fp) => fp.id === comp.footprint);

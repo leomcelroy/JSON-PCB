@@ -6,7 +6,6 @@ export function generatePlatedDrillFile({
   drills,
   unitConversionFactor,
 }) {
-  console.log(drills);
   const filename = generateFilename(projectName, true);
   const content = [
     ...generateHeader(true),
@@ -21,7 +20,6 @@ export function generateNonplatedDrillFile({
   drills,
   unitConversionFactor,
 }) {
-  console.log(drills);
   const filename = generateFilename(projectName, false);
   const content = [
     ...generateHeader(false),

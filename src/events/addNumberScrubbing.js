@@ -1,3 +1,5 @@
+import { createListener } from "../utils/createListener.js";
+
 const isDigit = (ch) => /[0-9]/i.test(ch) || ch === ".";
 
 export function addNumberScrubbing(el, cmView) {
@@ -164,12 +166,3 @@ function pauseEvent(e) {
   e.returnValue = false;
   return false;
 }
-
-const trigger = (e) => e.composedPath()[0];
-const matchesTrigger = (e, selectorString) =>
-  trigger(e).matches(selectorString);
-const createListener = (target) => (eventName, selectorString, event) => {
-  target.addEventListener(eventName, (e) => {
-    if (selectorString === "" || matchesTrigger(e, selectorString)) event(e);
-  });
-};

@@ -1,5 +1,6 @@
 import { patchState, STATE } from "../state.js";
 import { makePhantom } from "../makePhantom.js";
+import { createListener } from "../utils/createListener.js";
 
 export function addLayerReordering(el) {
   let draggedLayerEl = null;
@@ -78,12 +79,3 @@ function moveItem(arr, fromIndex, toIndex) {
   arr.splice(toIndex, 0, elementToMove);
   return arr;
 }
-
-const trigger = (e) => e.composedPath()[0];
-const matchesTrigger = (e, selectorString) =>
-  trigger(e).matches(selectorString);
-const createListener = (target) => (eventName, selectorString, event) => {
-  target.addEventListener(eventName, (e) => {
-    if (selectorString === "" || matchesTrigger(e, selectorString)) event(e);
-  });
-};

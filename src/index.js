@@ -1,4 +1,5 @@
-import { STATE, setBoard, patchState, renderLoop } from "./state.js";
+import { STATE, patchState } from "./state.js";
+import { setBoard } from "./setBoard/setBoard.js";
 import { addPanZoom } from "./events/addPanZoom.js";
 import { addPointDragging } from "./events/addPointDragging.js";
 import { addComponentDragging } from "./events/addComponentDragging.js";
@@ -23,7 +24,6 @@ function init(state) {
   r(view(state), document.body);
 
   resizeCanvas();
-  // renderLoop();
 
   const editor = document.querySelector(".code-editor");
   initCodeEditor(editor);

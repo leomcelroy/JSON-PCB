@@ -1,3 +1,5 @@
+import { createListener } from "../utils/createListener.js";
+
 function upload(files, onDrop) {
   const file = files[0];
 
@@ -67,15 +69,6 @@ function pauseEvent(e) {
   e.returnValue = false;
   return false;
 }
-
-const trigger = (e) => e.composedPath()[0];
-const matchesTrigger = (e, selectorString) =>
-  trigger(e).matches(selectorString);
-const createListener = (target) => (eventName, selectorString, event) => {
-  target.addEventListener(eventName, (e) => {
-    if (selectorString === "" || matchesTrigger(e, selectorString)) event(e);
-  });
-};
 
 // ---------------------------
 

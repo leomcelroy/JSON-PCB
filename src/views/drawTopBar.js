@@ -2,7 +2,7 @@ import { html } from "lit-html";
 import { getBoardBoundingBox } from "../boardHelpers/getBoardBoundingBox.js";
 import { testPCB } from "../testPCB.js";
 import { jsonPopUp } from "../modals/jsonPopUp.js";
-import { setBoard, patchState } from "../state.js";
+import { patchState } from "../state.js";
 import { formatCode } from "../formatCode.js";
 import { downloadPNG } from "../download/downloadPNG.js";
 import { downloadText } from "../download/downloadText.js";
@@ -15,6 +15,7 @@ import { scaleSvgModal } from "../modals/scaleSvgModal.js";
 import { scaleGerberModal } from "../modals/scaleGerberModal.js";
 import { getRawDataBoundingBox } from "../rawData/downloadSVG.js";
 import { rawDataToGerberData } from "../rawData/rawDataToGerberData.js";
+import { setBoard } from "../setBoard/setBoard.js";
 
 export function drawTopBar(state) {
   return html`

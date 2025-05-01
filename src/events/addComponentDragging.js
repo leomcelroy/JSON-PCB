@@ -1,13 +1,5 @@
-import { patchState, setBoard } from "../state.js";
-import { processComponent } from "../processComponent.js";
-import { getLayers } from "../boardHelpers/getLayers.js";
-
-function round(num, ops = {}) {
-  const decimalPlaces = ops.decimalPlaces ?? 2;
-
-  const factor = Math.pow(10, decimalPlaces);
-  return Math.round(num * factor) / factor;
-}
+import { patchState } from "../state.js";
+import { createListener } from "../utils/createListener.js";
 
 export function addComponentDragging(el) {
   function getPoint(e) {
@@ -48,18 +40,17 @@ export function addComponentDragging(el) {
     let currentPoint = getPoint(e);
 
     patchState((s) => {
-      const comp = s.board.components.find((x) => x.id === clickedId);
-      comp.translate = currentPoint.map(round);
-
+      // const comp = s.board.components.find((x) => x.id === clickedId);
+      // comp.translate = currentPoint.map(round);
       // is there a way to do less here
       // i need to update the component
       // and the bounding box of the component
       // and layers
       // setBoard(s.board);
-      const newComp = processComponent(comp, s.board);
-      const index = s.board.components.findIndex((x) => x.id === clickedId);
-      s.board.components[index] = newComp;
-      s.layers = getLayers(s.board);
+      // const newComp = processComponent(comp, s.board);
+      // const index = s.board.components.findIndex((x) => x.id === clickedId);
+      // s.board.components[index] = newComp;
+      // s.layers = getLayers(s.board);
     });
   });
 
@@ -77,12 +68,3 @@ export function addComponentDragging(el) {
     el.panZoomFns.togglePanZoom(false);
   });
 }
-
-const trigger = (e) => e.composedPath()[0];
-const matchesTrigger = (e, selectorString) =>
-  trigger(e).matches(selectorString);
-const createListener = (target) => (eventName, selectorString, event) => {
-  target.addEventListener(eventName, (e) => {
-    if (selectorString === "" || matchesTrigger(e, selectorString)) event(e);
-  });
-};

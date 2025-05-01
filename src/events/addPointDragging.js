@@ -1,12 +1,8 @@
-import { patchState, STATE, setBoard } from "../state.js";
+import { patchState, STATE } from "../state.js";
+import { setBoard } from "../setBoard/setBoard.js";
 import { contourToShapes } from "../contourToShapes/contourToShapes.js";
-
-function round(num, ops = {}) {
-  const decimalPlaces = ops.decimalPlaces ?? 2;
-
-  const factor = Math.pow(10, decimalPlaces);
-  return Math.round(num * factor) / factor;
-}
+import { createListener } from "../utils/createListener.js";
+import { suggestVH } from "../utils/suggestVH.js";
 
 export function addPointDragging(el) {
   function getPoint(e) {
@@ -158,32 +154,4 @@ export function addPointDragging(el) {
       patchState();
     }
   });
-}
-
-const trigger = (e) => e.composedPath()[0];
-const matchesTrigger = (e, selectorString) =>
-  trigger(e).matches(selectorString);
-const createListener = (target) => (eventName, selectorString, event) => {
-  target.addEventListener(eventName, (e) => {
-    if (selectorString === "" || matchesTrigger(e, selectorString)) event(e);
-  });
-};
-
-function suggestVH(points, newPoint, tolerance) {
-  const [newX, newY] = newPoint;
-
-  let suggestedX = newX;
-  let suggestedY = newY;
-
-  points.forEach(([x, y], index) => {
-    if (Math.abs(x - newX) <= tolerance) {
-      suggestedX = x;
-    }
-
-    if (Math.abs(y - newY) <= tolerance) {
-      suggestedY = y;
-    }
-  });
-
-  return [suggestedX, suggestedY];
 }
