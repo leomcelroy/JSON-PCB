@@ -147,7 +147,7 @@ export function addNumberScrubbing(el, cmView) {
     // console.log("run");
     // dispatch("RUN", { dragging: true });
 
-    document.querySelector("[run-code-trigger]").click();
+    document.querySelector("[run-code-btn]").click();
     pauseEvent(e);
   });
 

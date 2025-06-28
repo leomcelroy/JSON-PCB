@@ -11,13 +11,32 @@ export type Board = {
   mmPerUnit: number;
 };
 
-export type Corner = ["fillet", number] | ["chamfer", number] | ["biarc"];
+export type Corner =
+  | ["fillet", radius: number]
+  | ["chamfer", radius: number]
+  | ["biarc"]
+  | [];
 
 export type PathCommand =
-  | ["start", number, number, Corner?]
-  | ["absolute", number, number, Corner?]
-  | ["relative", number, number, Corner?]
-  | ["close"];
+  | ["start" | "s", x: number, y: number, ...Corner]
+  | ["absolute" | "a", x: number, y: number, ...Corner]
+  | ["relative" | "r", dx: number, dy: number, ...Corner]
+  | ["close" | "c"];
+
+// export type PathCommand2 =
+//   | ["start" | "s", x: number, y: number]
+//   | ["absolute" | "a", x: number, y: number]
+//   | ["relative" | "r", dx: number, dy: number]
+//   | ["start fillet" | "s fillet", x: number, y: number, radius: number]
+//   | ["absolute fillet" | "a fillet", x: number, y: number, radius: number]
+//   | ["relative fillet" | "r fillet", dx: number, dy: number, radius: number]
+//   | ["start chamfer" | "s chamfer", x: number, y: number, radius: number]
+//   | ["absolute chamfer" | "a chamfer", x: number, y: number, radius: number]
+//   | ["relative chamfer" | "r chamfer", dx: number, dy: number, radius: number]
+//   | ["start biarc" | "s biarc", x: number, y: number]
+//   | ["absolute biarc" | "a biarc", x: number, y: number]
+//   | ["relative biarc" | "r biarc", dx: number, dy: number]
+//   | ["close" | "c"];
 
 export type Path = PathCommand[];
 
@@ -38,33 +57,33 @@ export type Footprint = {
 export type Component = {
   id: string;
   footprint: string;
-  position: [number, number];
+  position: [x: number, y: number];
   rotate: number;
   flip: boolean;
 };
 
 export type Pad = {
   id: string;
-  position: [number, number];
+  position: [x: number, y: number];
 };
 
-export type Region = {
+export interface Region {
   contour: Path;
   layers: Layer[];
   polarity: Polarity;
   maskOffset?: number;
-};
+}
 
-export type Trace = {
+export interface Trace {
   track: Path;
   diameter: number;
   layers: Layer[];
   polarity: Polarity;
   maskOffset?: number;
-};
+}
 
 export type Drill = {
-  position: [number, number];
+  position: [x: number, y: number];
   diameter: number;
   start: Layer;
   end: Layer;

@@ -1,8 +1,7 @@
 import { html, svg } from "lit-html";
 
 export function renderFootprintMenu(state) {
-  const footprints = state?.board?.footprints;
-  if (!footprints) return "";
+  const footprints = state?.processedBoard?.footprints ?? [];
 
   const results = [];
 

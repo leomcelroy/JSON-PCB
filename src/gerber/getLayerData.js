@@ -1,9 +1,6 @@
 import { isOutline } from "./isOutline.js";
-import { getLayers } from "../boardHelpers/getLayers.js";
 
-export function getLayerData(board, flatten = false) {
-  const layers = getLayers(board);
-
+export function getLayerData(layers, flatten = false) {
   const newLayers = {};
   const apertures = [];
   const outlineApertureSize = 0;
@@ -43,7 +40,7 @@ export function getLayerData(board, flatten = false) {
 
       empty = false;
 
-      const apertureIndex = getApertureIndex(trace.thickness);
+      const apertureIndex = getApertureIndex(trace.diameter);
 
       negative.traces.push({ shapes, apertureIndex });
     });
@@ -61,7 +58,7 @@ export function getLayerData(board, flatten = false) {
 
       empty = false;
 
-      const apertureIndex = getApertureIndex(trace.thickness);
+      const apertureIndex = getApertureIndex(trace.diameter);
 
       positive.traces.push({ shapes, apertureIndex });
     });

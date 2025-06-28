@@ -1,21 +1,29 @@
-import { createListener } from "../utils/createListener.js";
+import { createListener } from "../utils/createListener";
+import { kicadParse } from "../kicadParse/kicadParse";
+import { setBoard } from "../setBoard";
 
-function upload(files, onDrop) {
-  const file = files[0];
+function onDropDefault({ name, text, board }) {
+  const extension = name.split(".").at(-1);
+  if (extension === "kicad_mod") {
+    const sParsed = kicadParse(text);
 
-  var reader = new FileReader();
-  reader.readAsText(file);
+    const currentIds = new Set(board.footprints.map((x) => x.id));
+    if (currentIds.has(sParsed.id)) {
+      alert(`Footprint with ID (${sParsed.id}) exists.`);
+      return;
+    }
 
-  reader.onloadend = (event) => {
-    let text = reader.result;
-    if (onDrop) onDrop({ name: file.name, text });
-  };
+    board.footprints.push(sParsed);
+    setBoard(board);
+  }
 
-  return;
+  if (extension === "json") {
+    setBoard(JSON.parse(text));
+  }
 }
 
-export function addDropUpload(el, ops = {}) {
-  const onDrop = ops.onDrop ?? null;
+export function addDropUpload(el, state) {
+  const onDrop = onDropDefault;
 
   const dropModal = document.createElement("div");
   dropModal.innerHTML = `
@@ -60,6 +68,20 @@ export function addDropUpload(el, ops = {}) {
   listen("mouseleave", "", function (evt) {
     dropModal.classList.add("hidden");
   });
+
+  function upload(files, onDrop) {
+    const file = files[0];
+
+    var reader = new FileReader();
+    reader.readAsText(file);
+
+    reader.onloadend = (event) => {
+      let text = reader.result;
+      if (onDrop) onDrop({ name: file.name, text, board: state.board });
+    };
+
+    return;
+  }
 }
 
 function pauseEvent(e) {

@@ -1,5 +1,7 @@
-import { patchState } from "../state.js";
-import { createListener } from "../utils/createListener.js";
+import { patchState } from "../state";
+import { createListener } from "../utils/createListener";
+import { setBoard } from "../setBoard";
+import { round } from "../utils/round";
 
 export function addComponentDragging(el) {
   function getPoint(e) {
@@ -22,12 +24,7 @@ export function addComponentDragging(el) {
     clickedId = e.target.dataset.componentId;
 
     patchState((s) => {
-      s.editPath.editing = false;
-      s.editModal = {
-        open: true,
-        type: "components",
-        id: clickedId,
-      };
+      s.selectedComponents = new Set([clickedId]);
     });
 
     dragging = true;
@@ -40,17 +37,9 @@ export function addComponentDragging(el) {
     let currentPoint = getPoint(e);
 
     patchState((s) => {
-      // const comp = s.board.components.find((x) => x.id === clickedId);
-      // comp.translate = currentPoint.map(round);
-      // is there a way to do less here
-      // i need to update the component
-      // and the bounding box of the component
-      // and layers
-      // setBoard(s.board);
-      // const newComp = processComponent(comp, s.board);
-      // const index = s.board.components.findIndex((x) => x.id === clickedId);
-      // s.board.components[index] = newComp;
-      // s.layers = getLayers(s.board);
+      const comp = s.board.components.find((x) => x.id === clickedId);
+      comp.position = currentPoint.map(round);
+      setBoard(s.board);
     });
   });
 

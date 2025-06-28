@@ -1,5 +1,5 @@
-import { patchState } from "../state.js";
-import { createListener } from "../utils/createListener.js";
+import { patchState } from "../state";
+import { createListener } from "../utils/createListener";
 
 export function addPanZoom(el) {
   let cancelPanZoom = false;

@@ -1,0 +1,3 @@
+/*
+takes new position for component and updates board and processedBoard
+*/

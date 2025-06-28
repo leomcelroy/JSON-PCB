@@ -1,8 +1,8 @@
-import { patchState } from "../state.js";
-import { makePhantom } from "../makePhantom.js";
-import { createListener } from "../utils/createListener.js";
-import { round } from "../utils/round.js";
-import { setBoard } from "../setBoard/setBoard.js";
+import { patchState } from "../state";
+import { makePhantom } from "../utils/makePhantom";
+import { createListener } from "../utils/createListener";
+import { round } from "../utils/round";
+import { setBoard } from "../setBoard";
 
 export function addComponentAdding(el) {
   function getPoint(e) {
@@ -38,25 +38,26 @@ export function addComponentAdding(el) {
           let possibleId = () => `${target.footprintId}_${i}`;
 
           patchState((s) => {
-            while (s.board.components.map((x) => x.id).includes(possibleId()))
+            const { board } = s;
+
+            while (
+              s.processedBoard.components
+                .map((x) => x.id)
+                .includes(possibleId())
+            )
               i++;
 
             const newComp = {
               id: possibleId(),
               footprint: target.footprintId,
-              translate: transformedPoint.map(round),
+              position: transformedPoint.map(round),
             };
 
-            s.board.components.push(newComp);
+            board.components.push(newComp);
 
-            setBoard(s.board);
+            setBoard(board);
 
-            s.editPath.editing = false;
-            s.editModal = {
-              open: true,
-              type: "components",
-              id: newComp.id,
-            };
+            s.selectedComponents = new Set([newComp.id]);
           });
         }
       });

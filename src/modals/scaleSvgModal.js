@@ -1,5 +1,4 @@
 import { html, render } from "lit-html";
-import { patchState } from "../state.js"; // Assuming patchState updates UI if needed
 
 export function scaleSvgModal({
   currentWidth, // in original units

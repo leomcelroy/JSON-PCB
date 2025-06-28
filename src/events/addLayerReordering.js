@@ -1,5 +1,5 @@
-import { patchState, STATE } from "../state.js";
-import { makePhantom } from "../makePhantom.js";
+import { patchState, STATE } from "../state";
+import { makePhantom } from "../utils/makePhantom.js";
 import { createListener } from "../utils/createListener.js";
 
 export function addLayerReordering(el) {

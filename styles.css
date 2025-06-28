@@ -50,11 +50,14 @@ body {
   height: 100%;
   overflow: hidden;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .code-editor {
-  height: 100%;
+  flex: 1;
   overflow: hidden;
+  border-radius: 5px;
 }
 
 .cm-editor {

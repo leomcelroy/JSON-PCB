@@ -1,6 +1,6 @@
 import { html } from "lit-html";
-import { patchState } from "../state.js";
-import { setBoard } from "../setBoard/setBoard.js";
+// import { patchState } from "../../state";
+// import { setBoard } from "../../setBoard/setBoard";
 
 export function renderEditModal(state) {
   if (!state.editModal.open) return "";

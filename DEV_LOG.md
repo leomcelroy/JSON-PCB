@@ -1,5 +1,12 @@
 # DEV LOG
 
+### May 6, 2025
+
+- Need to port
+  - path editting
+  - efficient updating
+  - remove polyline generation
+
 ### April 24, 2025
 
 - Memory leak from console.log

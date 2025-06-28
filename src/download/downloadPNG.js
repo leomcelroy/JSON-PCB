@@ -1,11 +1,12 @@
 import { changeDpiDataUrl } from "./changeDPI.js";
-import { getBoardBoundingBox } from "../boardHelpers/getBoardBoundingBox.js";
-import { drawLayer } from "../views/drawLayer.js";
+import { drawLayer } from "../canvas/drawLayer.js";
 
 export function downloadPNG(state, name, dpi = 1000) {
-  const { layers, colorMap, layerOrder, layerNotVisible, panZoomFns } = state;
+  const { processedBoard, colorMap, layerOrder, layerNotVisible } = state;
 
-  const boundingBox = getBoardBoundingBox(state.board);
+  const layers = processedBoard.layers;
+  const boundingBox = processedBoard.boardBoundingBox;
+  const mmPerUnit = processedBoard.mmPerUnit;
 
   const limits = {
     x: [boundingBox.xMin, boundingBox.xMax],
@@ -14,11 +15,11 @@ export function downloadPNG(state, name, dpi = 1000) {
 
   limits.y = limits.y.map((y) => -y).reverse();
 
-  const w = (limits.x[1] - limits.x[0]) * state.board.mmPerUnit;
-  const h = (limits.y[1] - limits.y[0]) * state.board.mmPerUnit;
+  const w = (limits.x[1] - limits.x[0]) * mmPerUnit;
+  const h = (limits.y[1] - limits.y[0]) * mmPerUnit;
 
-  var width = (dpi * w) / state.board.mmPerUnit;
-  var height = (dpi * h) / state.board.mmPerUnit;
+  var width = (dpi * w) / mmPerUnit;
+  var height = (dpi * h) / mmPerUnit;
 
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -60,6 +61,7 @@ export function downloadPNG(state, name, dpi = 1000) {
         if (layerNotVisible.has(layer)) return;
         drawLayer({
           tracesRegions,
+          drills: processedBoard.drills,
           color: colorMap[layer],
           tempCanvas: document.querySelector(".workarea-canvas-temp"),
           canvas,
@@ -68,47 +70,18 @@ export function downloadPNG(state, name, dpi = 1000) {
           y: y,
         });
       });
-
-    ctx.fillStyle = bgColor;
-    ctx.setTransform(scale, 0, 0, -scale, x, y);
-    state.board.components.forEach((comp) => {
-      comp.pads.forEach((pad) => {
-        const { position, drill } = pad;
-
-        if (drill && drill.diameter) {
-          ctx.beginPath();
-          ctx.arc(position[0], position[1], drill.diameter / 2, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      });
-    });
   }
 
-  // document.body.append(canvas);
-  // canvas.style = `
-  //                 position: absolute;
-  //                 left: 0;
-  //                 top: 0;
-  //                 border: 1px solid black;
-  //               `;
-
-  // setTimeout(() => {
-  //   canvas.remove();
-  // }, 2000);
+  console.log(canvas);
 
   dlCanvas(canvas, name);
 }
 
 function dlCanvas(canvas, name) {
-  // Convert the canvas to data
   var image = canvas.toDataURL("image/png");
   image = changeDpiDataUrl(image, 1000);
-  // Create a link
   var aDownloadLink = document.createElement("a");
-  // Add the name of the file to the link
   aDownloadLink.download = `${name}.png`;
-  // Attach the data to the link
   aDownloadLink.href = image;
-  // Get the code to click the download link
   aDownloadLink.click();
 }

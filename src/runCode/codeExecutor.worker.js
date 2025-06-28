@@ -1,27 +1,38 @@
 import { toolkit as tk } from "../polylineToolkit/toolkit";
-import { path } from "../path.js";
+import { processBoard } from "../processBoard/processBoard";
 
-async function executeDynamicModule(code, board) {
+function executeDynamicModule(code, board, timestamp) {
   const included = {
     board,
     tk,
-    path,
     print(...args) {
       try {
         const stringifiedArgs = args
           .map((arg) => JSON.stringify(arg, null, 2))
           .join(" ");
-        self.postMessage({ status: "print", data: stringifiedArgs });
+        self.postMessage({
+          status: "print",
+          data: stringifiedArgs,
+          requestTimestamp: timestamp,
+        });
       } catch (error) {
         self.postMessage({
           status: "print",
           data: "[Could not stringify arguments]",
+          requestTimestamp: timestamp,
         });
         throw error;
       }
     },
     setBoard(board) {
-      self.postMessage({ status: "success", result: board });
+      self.postMessage({
+        status: "success",
+        result: {
+          board,
+          processedBoard: processBoard(board),
+        },
+        requestTimestamp: timestamp,
+      });
     },
   };
 
@@ -35,20 +46,23 @@ async function executeDynamicModule(code, board) {
       `
     );
 
-    const result = await userFunction(...Object.values(included));
-    return result;
+    userFunction(...Object.values(included));
   } catch (error) {
     throw error;
   }
 }
 
-self.onmessage = async (event) => {
-  const { code, board } = event.data;
+self.onmessage = (event) => {
+  const { code, board, timestamp } = event.data;
 
   try {
-    await executeDynamicModule(code, board);
+    executeDynamicModule(code, board, timestamp);
   } catch (error) {
-    self.postMessage({ status: "error", error: error.message });
+    self.postMessage({
+      status: "error",
+      error: error.stack || error.message,
+      requestTimestamp: timestamp,
+    });
   }
 };
 
@@ -89,7 +103,7 @@ async function executeDynamicModuleImport(code, board) {
       throw new Error("User code did not export a default function.");
     }
   } catch (error) {
-    console.error("Worker: Error executing user code:", error);
+    console.error("Worker: Error executing user code:", error.stack || error);
     // Re-throw the error to be caught by the onerror handler in the main thread
     throw error;
   }

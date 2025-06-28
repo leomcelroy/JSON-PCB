@@ -18,9 +18,14 @@ export function downloadGerber(
   generateGerberFiles(gerberData, conversionFactor, filename);
 }
 
-export function boardToGerberData(board) {
-  const drills = getDrillData(board);
-  const { layers, apertures, outline } = getLayerData(board);
+export function processedBoardToGerberData(board) {
+  const drills = board.drills;
+  drills.forEach((drill) => {
+    drill.x = drill.position[0];
+    drill.y = drill.position[1];
+  });
+
+  const { layers, apertures, outline } = getLayerData(board.layers);
   const gerberData = { apertures, layers, drills, outline };
 
   return gerberData;
@@ -28,8 +33,6 @@ export function boardToGerberData(board) {
 
 export function generateGerberFiles(pcbData, conversionFactor, filename) {
   const { layers, name, apertures, drills, outline } = pcbData;
-
-  console.log("drills");
 
   const unitConversionFactor = conversionFactor;
 
@@ -62,25 +65,31 @@ export function generateGerberFiles(pcbData, conversionFactor, filename) {
 
   const platedDrills = [];
   const nonplatedDrills = [];
-  const platedRouts = [];
-  const nonplatedRouts = [];
+  // const platedRouts = [];
+  // const nonplatedRouts = [];
 
   drills.forEach((drill) => {
-    const isRout = drill.track.flat().length === 1;
-    if (isRout && drill.plated) {
-      platedRouts.push(drill);
-    } else if (isRout && !drill.plated) {
-      nonplatedRouts.push(drill);
-    } else if (!isRout && drill.plated) {
+    // const isRout = drill.track.flat().length === 1;
+    // if (isRout && drill.plated) {
+    //   platedRouts.push(drill);
+    // } else if (isRout && !drill.plated) {
+    //   nonplatedRouts.push(drill);
+    // } else if (!isRout && drill.plated) {
+    //   platedDrills.push(drill);
+    // } else if (!isRout && !drill.plated) {
+    //   nonplatedDrills.push(drill);
+    // }
+
+    if (drill.plated) {
       platedDrills.push(drill);
-    } else if (!isRout && !drill.plated) {
+    } else if (!drill.plated) {
       nonplatedDrills.push(drill);
     }
   });
 
-  if (platedRouts.length > 0 || nonplatedRouts.length > 0) {
-    console.warn("Routs are not yet supported.");
-  }
+  // if (platedRouts.length > 0 || nonplatedRouts.length > 0) {
+  //   console.warn("Routs are not yet supported.");
+  // }
 
   // Drills
   zip.file(

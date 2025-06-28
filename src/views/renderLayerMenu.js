@@ -1,5 +1,5 @@
 import { html } from "lit-html";
-import { patchState } from "../state.js";
+import { patchState } from "../state";
 
 export function renderLayerMenu(state) {
   const { colorMap, layerOrder, layerNotVisible } = state;
