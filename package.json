@@ -16,6 +16,6 @@
     "js-beautify": "^1.15.1",
     "jszip": "^3.10.1",
     "lit-html": "^3.2.0",
-    "tailwind": "^4.0.0"
+    "tailwind": "^2.3.1"
   }
 }
