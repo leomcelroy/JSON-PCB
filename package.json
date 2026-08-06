@@ -5,7 +5,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "vite": "^4.0.1"
+    "vite": "^8.2.1"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.3",
@@ -13,7 +13,6 @@
     "file-saver": "^2.0.5",
     "js-beautify": "^1.15.1",
     "jszip": "^3.10.1",
-    "lit-html": "^3.2.0",
-    "tailwind": "^4.0.0"
+    "lit-html": "^3.2.0"
   }
 }
