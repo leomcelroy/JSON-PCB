@@ -15,8 +15,8 @@ These two things made me want to make this. It doesn't replace SVG-PCB. It just 
 
 These principles were:
 
-- Have a static easily serializable and transfrable format for describing boards.
-- Make sure this format and losslessly map to Gerber.
+- Have a static easily serializable and transferable format for describing boards.
+- Make sure this format can losslessly map to Gerber.
 - Make an editor for this format that is easy to use and allows manipulation over all aspects.
 
 ## The Board Format
